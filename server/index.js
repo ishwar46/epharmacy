@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/fixpharmacy
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/products', require('../server/routes/product'));
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
