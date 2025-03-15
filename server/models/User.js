@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     // New field to store the encrypted plain password for admin use
     plainPassword: {
         type: String,
-        required: [true, 'Plain password is required'],
+        required: [false, 'Plain password is required'],
         select: false // Not returned by default in queries
     },
     role: {
