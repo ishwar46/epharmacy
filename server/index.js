@@ -1,6 +1,6 @@
-// server.js
 require('dotenv').config();
 const express = require('express');
+const cors = require("cors");
 const mongoose = require('mongoose');
 const authRoutes = require('../server/routes/auth');
 const adminRoutes = require('../server/routes/admin');
@@ -10,6 +10,13 @@ const app = express();
 // Middleware to parse JSON requests
 app.use(express.json());
 
+const corsOptions = {
+    origin: true,
+    credentials: true,
+    optionSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/fixpharmacy', {
 
