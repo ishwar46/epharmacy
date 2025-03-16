@@ -18,6 +18,7 @@ import Pagination from "../components/Paginations";
 import ProductModal from "../components/ProductModal";
 import EditProductModal from "../components/EditProductModal";
 import CreateProductModal from "../components/CreateProductModal";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import categories from "../constants/categories";
 
 const PharmacyDashboard = () => {
@@ -44,6 +45,10 @@ const PharmacyDashboard = () => {
 
   // Add new product modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Delete confirmation modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const navigate = useNavigate();
 
@@ -79,19 +84,23 @@ const PharmacyDashboard = () => {
     setProducts((prevProducts) => [newProduct, ...prevProducts]);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
     try {
-      await axios.delete(`http://localhost:5500/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setProducts(products.filter((p) => p._id !== id));
+      await deleteProduct(productToDelete._id);
+      setProducts((prev) => prev.filter((p) => p._id !== productToDelete._id));
       toast.success("Product deleted successfully!");
     } catch (error) {
       console.error("Error deleting product:", error);
       toast.error("Failed to delete product.");
     }
+    setDeleteModalOpen(false);
+    setProductToDelete(null);
   };
 
   // Filter products based on search query and filters
@@ -319,7 +328,7 @@ const PharmacyDashboard = () => {
                     <FaEye />
                   </button>
                   <button
-                    onClick={() => handleDelete(product._id)}
+                    onClick={() => handleDeleteClick(product)}
                     className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1 rounded text-sm hover:bg-red-50"
                   >
                     <FaTrash />
@@ -362,6 +371,12 @@ const PharmacyDashboard = () => {
           onProductCreated={handleProductCreated}
         />
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        open={deleteModalOpen}
+        handleClose={() => setDeleteModalOpen(false)}
+        handleConfirm={confirmDelete}
+      />
     </div>
   );
 };

@@ -41,10 +41,10 @@ const CreateProductModal = ({ open, handleClose, onProductCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const newProduct = await createProduct(formData); // 🔥 Store the newly created product
+      const newProduct = await createProduct(formData);
       toast.success("Product added successfully!");
       handleClose();
-      onProductCreated(newProduct.data); // Pass the new product instead of re-fetching
+      onProductCreated(newProduct.data);
     } catch (error) {
       console.error("Error creating product:", error);
       toast.error("Failed to add product.");
@@ -56,7 +56,7 @@ const CreateProductModal = ({ open, handleClose, onProductCreated }) => {
   if (!isModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-lg p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
