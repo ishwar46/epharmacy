@@ -1,13 +1,21 @@
-// src/pages/PharmacyDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../services/authService";
 import { getProducts } from "../services/productService";
 import { getOrders } from "../services/orderService";
 import axios from "axios";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaEdit,
+  FaEye,
+  FaTrash,
+  FaBox,
+  FaShoppingCart,
+  FaCubes,
+} from "react-icons/fa";
 import toast from "react-hot-toast";
 import Pagination from "../components/Paginations";
+import ProductModal from "../components/ProductModal";
+import EditProductModal from "../components/EditProductModal";
 
 const PharmacyDashboard = () => {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -23,29 +31,45 @@ const PharmacyDashboard = () => {
   // Pagination state
   const [startIndex, setStartIndex] = useState(0);
 
+  // Modal states for product details (View)
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // Modal states for editing a product
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
+
   const navigate = useNavigate();
 
+  // Function to fetch admin info, products, and orders
+  const fetchData = async () => {
+    try {
+      const meResponse = await getMe();
+      setAdminInfo(meResponse.data);
+
+      const productsResponse = await getProducts();
+      setProducts(productsResponse.data);
+
+      const ordersResponse = await getOrders();
+      setOrderCount(ordersResponse.count);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const meResponse = await getMe();
-        setAdminInfo(meResponse.data);
-
-        const productsResponse = await getProducts();
-        setProducts(productsResponse.data);
-
-        const ordersResponse = await getOrders();
-        setOrderCount(ordersResponse.count);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
+  // Handle Edit - open the edit modal with selected product data
+  const handleEdit = (product) => {
+    setProductToEdit(product);
+    setEditModalOpen(true);
+  };
+
+  // Handle Delete - calls the API to delete a product and updates the UI
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
@@ -80,6 +104,12 @@ const PharmacyDashboard = () => {
   const totalProducts = products.length;
   const totalOrders = orderCount;
   const totalStock = products.reduce((acc, product) => acc + product.stock, 0);
+
+  // Handle view details (opens the view modal)
+  const handleViewDetails = (product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -130,43 +160,43 @@ const PharmacyDashboard = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 cursor-pointer">
         {/* Total Products */}
-        <div className="flex flex-col bg-white rounded border border-gray-200 p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="w-6 h-6 inline-flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full text-sm font-bold">
-              P
-            </span>
-            <h2 className="font-medium text-gray-700">Total Products</h2>
+        <div className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105">
+          <div className="flex items-center justify-center w-10 h-10 bg-indigo-500 text-white rounded-full shadow-sm mb-2">
+            <FaBox size={22} />
           </div>
-          <span className="text-2xl font-semibold">{totalProducts}</span>
+          <h2 className="text-sm font-medium text-gray-600">Total Products</h2>
+          <span className="text-xl font-semibold text-indigo-600">
+            {totalProducts}
+          </span>
         </div>
 
         {/* Total Orders */}
-        <div className="flex flex-col bg-white rounded border border-gray-200 p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="w-6 h-6 inline-flex items-center justify-center bg-red-100 text-red-600 rounded-full text-sm font-bold">
-              O
-            </span>
-            <h2 className="font-medium text-gray-700">Total Orders</h2>
+        <div className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105">
+          <div className="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full shadow-sm mb-2">
+            <FaShoppingCart size={22} />
           </div>
-          <span className="text-2xl font-semibold">{totalOrders}</span>
+          <h2 className="text-sm font-medium text-gray-600">Total Orders</h2>
+          <span className="text-xl font-semibold text-red-600">
+            {totalOrders}
+          </span>
         </div>
 
         {/* Total Stock */}
-        <div className="flex flex-col bg-white rounded border border-gray-200 p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="w-6 h-6 inline-flex items-center justify-center bg-green-100 text-green-600 rounded-full text-sm font-bold">
-              S
-            </span>
-            <h2 className="font-medium text-gray-700">Total Stock</h2>
+        <div className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105">
+          <div className="flex items-center justify-center w-10 h-10 bg-green-500 text-white rounded-full shadow-sm mb-2">
+            <FaCubes size={22} />
           </div>
-          <span className="text-2xl font-semibold">{totalStock}</span>
+          <h2 className="text-sm font-medium text-gray-600">Total Stock</h2>
+          <span className="text-xl font-semibold text-green-600">
+            {totalStock}
+          </span>
         </div>
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded border border-gray-200 p-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
         <table className="min-w-full text-sm text-left border-collapse">
           <caption className="mb-4">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -211,8 +241,11 @@ const PharmacyDashboard = () => {
               </div>
             </div>
           </caption>
-          <thead className="bg-gray-100">
-            <tr className="text-gray-700">
+
+          {/* Table Head */}
+          <thead className="bg-green-600 text-white">
+            <tr>
+              <th className="p-3 font-medium">SN</th>
               <th className="p-3 font-medium">Name</th>
               <th className="p-3 font-medium hidden md:table-cell">
                 Description
@@ -226,9 +259,12 @@ const PharmacyDashboard = () => {
               <th className="p-3 font-medium text-center">Actions</th>
             </tr>
           </thead>
+
+          {/* Table Body */}
           <tbody className="divide-y divide-gray-200">
-            {paginatedProducts.map((product) => (
-              <tr key={product._id} className="hover:bg-gray-50">
+            {paginatedProducts.map((product, index) => (
+              <tr key={product._id} className="hover:bg-gray-50 transition">
+                <td className="p-3">{startIndex + index + 1}</td>
                 <td className="p-3">{product.name}</td>
                 <td className="p-3 hidden md:table-cell truncate max-w-[150px]">
                   {product.description}
@@ -236,7 +272,7 @@ const PharmacyDashboard = () => {
                 <td className="p-3 hidden lg:table-cell truncate max-w-[100px]">
                   {product.dosage}
                 </td>
-                <td className="p-3 text-right">Rs.{product.price}</td>
+                <td className="p-3 text-right">Rs. {product.price}</td>
                 <td className="p-3 text-right">{product.stock}</td>
                 <td className="p-3 hidden md:table-cell">{product.category}</td>
                 <td className="p-3 hidden lg:table-cell">{product.brand}</td>
@@ -245,18 +281,22 @@ const PharmacyDashboard = () => {
                 </td>
                 <td className="p-3 flex items-center justify-center gap-2">
                   <button
-                    onClick={() =>
-                      navigate(`/admin/products/edit/${product._id}`)
-                    }
+                    onClick={() => handleEdit(product)}
                     className="inline-flex items-center gap-1 bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
                   >
-                    <FaEdit /> Edit
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleViewDetails(product)}
+                    className="inline-flex items-center gap-1 border border-green-500 text-green-500 px-3 py-1 rounded text-sm hover:bg-green-50"
+                  >
+                    <FaEye />
                   </button>
                   <button
                     onClick={() => handleDelete(product._id)}
                     className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1 rounded text-sm hover:bg-red-50"
                   >
-                    <FaTrash /> Delete
+                    <FaTrash />
                   </button>
                 </td>
               </tr>
@@ -270,6 +310,23 @@ const PharmacyDashboard = () => {
           setStartIndex={setStartIndex}
         />
       </div>
+      {/* Product Modal for Viewing */}
+      {modalOpen && selectedProduct && (
+        <ProductModal
+          open={modalOpen}
+          product={selectedProduct}
+          handleClose={() => setModalOpen(false)}
+        />
+      )}
+      {/* Edit Product Modal */}
+      {editModalOpen && productToEdit && (
+        <EditProductModal
+          open={editModalOpen}
+          product={productToEdit}
+          handleClose={() => setEditModalOpen(false)}
+          onUpdate={fetchData}
+        />
+      )}
     </div>
   );
 };
