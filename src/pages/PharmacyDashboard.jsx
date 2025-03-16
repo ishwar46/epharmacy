@@ -11,11 +11,14 @@ import {
   FaBox,
   FaShoppingCart,
   FaCubes,
+  FaPlus,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Pagination from "../components/Paginations";
 import ProductModal from "../components/ProductModal";
 import EditProductModal from "../components/EditProductModal";
+import CreateProductModal from "../components/CreateProductModal";
+import categories from "../constants/categories";
 
 const PharmacyDashboard = () => {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -38,6 +41,9 @@ const PharmacyDashboard = () => {
   // Modal states for editing a product
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
+
+  // Add new product modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -69,7 +75,10 @@ const PharmacyDashboard = () => {
     setEditModalOpen(true);
   };
 
-  // Handle Delete - calls the API to delete a product and updates the UI
+  const handleProductCreated = (newProduct) => {
+    setProducts((prevProducts) => [newProduct, ...prevProducts]);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
@@ -147,15 +156,29 @@ const PharmacyDashboard = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-5 cursor-pointer">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Pharmacy Dashboard
-        </h1>
-        <div className="text-right">
-          <p className="text-sm text-gray-700">{adminInfo.name}</p>
-          <p className="text-xs text-gray-500">{adminInfo.email}</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Pharmacy Dashboard
+          </h1>
+        </div>
+
+        {/* User Info */}
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <p className="text-sm font-medium text-gray-700">
+              {adminInfo.name}
+            </p>
+            <p className="text-xs text-gray-500">{adminInfo.email}</p>
+          </div>
+          {/* Profile Avatar */}
+          <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center bg-gray-100">
+            <span className="text-gray-600 font-semibold">
+              {adminInfo.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -205,10 +228,10 @@ const PharmacyDashboard = () => {
                   Products List
                 </h2>
                 <button
-                  onClick={() => navigate("/admin/products/new")}
-                  className="border border-blue-500 text-blue-500 px-3 py-1 rounded text-sm hover:bg-blue-50"
+                  onClick={() => setCreateModalOpen(true)}
+                  className="flex items-center gap-2 border border-blue-500 text-blue-500 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-500 hover:text-white transition duration-200"
                 >
-                  Add New Product
+                  <FaPlus size={14} /> Add Product
                 </button>
               </div>
               <div className="flex flex-col md:flex-row md:items-center gap-2">
@@ -225,10 +248,13 @@ const PharmacyDashboard = () => {
                   className="border border-gray-200 text-sm rounded-md py-2 px-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="All">All Categories</option>
-                  <option value="Oral Care">Oral Care</option>
-                  <option value="Anti-Cold">Anti-Cold</option>
-                  <option value="Beauty & Cosmetic">Beauty & Cosmetic</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
                 </select>
+
                 <select
                   onChange={(e) => setTypeFilter(e.target.value)}
                   value={typeFilter}
@@ -325,6 +351,15 @@ const PharmacyDashboard = () => {
           product={productToEdit}
           handleClose={() => setEditModalOpen(false)}
           onUpdate={fetchData}
+        />
+      )}
+
+      {/* Create Product Modal */}
+      {createModalOpen && (
+        <CreateProductModal
+          open={createModalOpen}
+          handleClose={() => setCreateModalOpen(false)}
+          onProductCreated={handleProductCreated}
         />
       )}
     </div>
