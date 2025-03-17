@@ -1,15 +1,17 @@
-// src/pages/AdminDashboard.jsx
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import PharmacyDashboard from "./PharmacyDashboard";
+import AdminOrders from "./AdminOrders";
+import AdminOrderDetails from "../components/AdminOrderDetails";
 import { getMe } from "../services/authService";
 
 const AdminDashboard = () => {
   const [selectedPage, setSelectedPage] = useState("dashboard");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [adminInfo, setAdminInfo] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +61,18 @@ const AdminDashboard = () => {
       >
         <div className="p-6">
           {selectedPage === "dashboard" && <PharmacyDashboard />}
-          {/* Render other pages based on selectedPage */}
+          {selectedPage === "orders" && (
+            <AdminOrders
+              setSelectedOrderId={setSelectedOrderId}
+              onSelect={() => setSelectedPage("orderDetails")}
+            />
+          )}
+          {selectedPage === "orderDetails" && selectedOrderId && (
+            <AdminOrderDetails
+              orderId={selectedOrderId}
+              goBack={() => setSelectedPage("orders")}
+            />
+          )}
         </div>
       </div>
     </div>
