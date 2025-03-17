@@ -16,11 +16,13 @@
     "@tailwindcss/vite": "^4.0.14",
     "axios": "^1.8.3",
     "framer-motion": "^12.5.0",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.482.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-lottie": "^1.2.10",
     "react-router-dom": "^7.3.0",
     "tailwindcss": "^4.0.14"
   },

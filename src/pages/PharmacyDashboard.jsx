@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../services/authService";
-import { getProducts } from "../services/productService";
+import { getProducts, deleteProduct } from "../services/productService";
 import { getOrders } from "../services/orderService";
-import axios from "axios";
 import {
   FaEdit,
   FaEye,
@@ -20,6 +19,8 @@ import EditProductModal from "../components/EditProductModal";
 import CreateProductModal from "../components/CreateProductModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import categories from "../constants/categories";
+import Lottie from "react-lottie";
+import noDataAnimation from "../assets/animations/nodata.json";
 
 const PharmacyDashboard = () => {
   const [adminInfo, setAdminInfo] = useState(null);
@@ -127,6 +128,15 @@ const PharmacyDashboard = () => {
   const handleViewDetails = (product) => {
     setSelectedProduct(product);
     setModalOpen(true);
+  };
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: noDataAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
   };
 
   if (loading) {
@@ -297,45 +307,63 @@ const PharmacyDashboard = () => {
 
           {/* Table Body */}
           <tbody className="divide-y divide-gray-200">
-            {paginatedProducts.map((product, index) => (
-              <tr key={product._id} className="hover:bg-gray-50 transition">
-                <td className="p-3">{startIndex + index + 1}</td>
-                <td className="p-3">{product.name}</td>
-                <td className="p-3 hidden md:table-cell truncate max-w-[150px]">
-                  {product.description}
-                </td>
-                <td className="p-3 hidden lg:table-cell truncate max-w-[100px]">
-                  {product.dosage}
-                </td>
-                <td className="p-3 text-right">Rs. {product.price}</td>
-                <td className="p-3 text-right">{product.stock}</td>
-                <td className="p-3 hidden md:table-cell">{product.category}</td>
-                <td className="p-3 hidden lg:table-cell">{product.brand}</td>
-                <td className="p-3 hidden md:table-cell">
-                  {product.medicineType}
-                </td>
-                <td className="p-3 flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => handleEdit(product)}
-                    className="inline-flex items-center gap-1 bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleViewDetails(product)}
-                    className="inline-flex items-center gap-1 border border-green-500 text-green-500 px-3 py-1 rounded text-sm hover:bg-green-50"
-                  >
-                    <FaEye />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(product)}
-                    className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1 rounded text-sm hover:bg-red-50"
-                  >
-                    <FaTrash />
-                  </button>
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((product, index) => (
+                <tr key={product._id} className="hover:bg-gray-50 transition">
+                  <td className="p-3">{startIndex + index + 1}</td>
+                  <td className="p-3">{product.name}</td>
+                  <td className="p-3 hidden md:table-cell truncate max-w-[150px]">
+                    {product.description}
+                  </td>
+                  <td className="p-3 hidden lg:table-cell truncate max-w-[100px]">
+                    {product.dosage}
+                  </td>
+                  <td className="p-3 text-right">Rs. {product.price}</td>
+                  <td className="p-3 text-right">{product.stock}</td>
+                  <td className="p-3 hidden md:table-cell">
+                    {product.category}
+                  </td>
+                  <td className="p-3 hidden lg:table-cell">{product.brand}</td>
+                  <td className="p-3 hidden md:table-cell">
+                    {product.medicineType}
+                  </td>
+                  <td className="p-3 flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="inline-flex items-center gap-1 bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleViewDetails(product)}
+                      className="inline-flex items-center gap-1 border border-green-500 text-green-500 px-3 py-1 rounded text-sm hover:bg-green-50"
+                    >
+                      <FaEye />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(product)}
+                      className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1 rounded text-sm hover:bg-red-50"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="10"
+                  className="p-6 text-center text-gray-600 flex flex-col items-center justify-center"
+                >
+                  <div className="w-48 h-48">
+                    <Lottie options={defaultOptions} height={150} width={150} />
+                  </div>
+                  <p className="text-gray-500 font-medium mt-2">
+                    No Products Found
+                  </p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         {/* Pagination */}
