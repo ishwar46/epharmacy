@@ -13,6 +13,7 @@ import Lottie from "react-lottie";
 import noDataAnimation from "../assets/animations/nodata.json";
 import { formatDate } from "../utils/dateUtils";
 import { getStatusColor } from "../utils/statusUtils";
+import Loading from "../components/Loading";
 
 const AdminOrders = ({ setSelectedOrderId, onSelect }) => {
   const [orders, setOrders] = useState([]);
@@ -41,28 +42,7 @@ const AdminOrders = ({ setSelectedOrderId, onSelect }) => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <svg
-          className="animate-spin text-indigo-500 h-8 w-8"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25 stroke-current"
-            cx="12"
-            cy="12"
-            r="10"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75 fill-current"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (orders.length === 0) {

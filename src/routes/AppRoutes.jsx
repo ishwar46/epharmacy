@@ -5,6 +5,8 @@ import AdminDashboard from "../pages/AdminDashboard";
 import AdminOrders from "../pages/AdminOrders";
 import AdminOrderDetails from "../components/AdminOrderDetails";
 import AdminRoute from "../components/AdminRoute";
+import NotFound from "../pages/NotFound";
+import ProductsDashboard from "../pages/ProductsDashboard";
 
 const AppRoutes = () => {
   return (
@@ -38,9 +40,16 @@ const AppRoutes = () => {
           </AdminRoute>
         }
       />
-
+      <Route
+        path="/admin/products"
+        element={
+          <AdminRoute>
+            <ProductsDashboard />
+          </AdminRoute>
+        }
+      />
       {/* Fallback route for non-existing pages */}
-      <Route path="*" element={<div>Page not found</div>} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

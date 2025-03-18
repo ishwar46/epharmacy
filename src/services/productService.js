@@ -34,7 +34,7 @@ export const createProduct = async (productData) => {
     // Append images (if any)
     if (productData.images && productData.images.length) {
         for (const file of productData.images) {
-            formData.append("images", file); // 'images' matches upload.array('images', 5)
+            formData.append("images", file);
         }
     }
 
@@ -51,7 +51,6 @@ export const createProduct = async (productData) => {
     return response.data;
 };
 
-// Update product (with optional new images)
 export const updateProduct = async (productId, productData) => {
     const formData = new FormData();
 

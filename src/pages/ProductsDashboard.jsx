@@ -2,16 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMe } from "../services/authService";
 import { getProducts, deleteProduct } from "../services/productService";
-import { getOrders } from "../services/orderService";
-import {
-  FaEdit,
-  FaEye,
-  FaTrash,
-  FaBox,
-  FaShoppingCart,
-  FaCubes,
-  FaPlus,
-} from "react-icons/fa";
+import { FaEdit, FaEye, FaTrash, FaBox, FaCubes, FaPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Pagination from "../components/Paginations";
 import ProductModal from "../components/ProductModal";
@@ -23,11 +14,10 @@ import Lottie from "react-lottie";
 import noDataAnimation from "../assets/animations/nodata.json";
 import Loading from "../components/Loading";
 
-const PharmacyDashboard = () => {
+const ProductsDashboard = () => {
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
-  const [orderCount, setOrderCount] = useState(0);
 
   // Filter/search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,34 +27,30 @@ const PharmacyDashboard = () => {
   // Pagination state
   const [startIndex, setStartIndex] = useState(0);
 
-  // Modal states for product details (View)
+  // Modal states
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Modal states for editing a product
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
 
-  // Add new product modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  // Delete confirmation modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
   const navigate = useNavigate();
 
-  // Function to fetch admin info, products, and orders
+  // Fetch admin info and products
   const fetchData = async () => {
     try {
+      // 1) Get admin info
       const meResponse = await getMe();
       setAdminInfo(meResponse.data);
 
+      // 2) Get products
       const productsResponse = await getProducts();
       setProducts(productsResponse.data);
-
-      const ordersResponse = await getOrders();
-      setOrderCount(ordersResponse.count);
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {
@@ -76,15 +62,18 @@ const PharmacyDashboard = () => {
     fetchData();
   }, []);
 
+  // Create new product
+  const handleProductCreated = (newProduct) => {
+    setProducts((prevProducts) => [newProduct, ...prevProducts]);
+  };
+
+  // Edit product
   const handleEdit = (product) => {
     setProductToEdit(product);
     setEditModalOpen(true);
   };
 
-  const handleProductCreated = (newProduct) => {
-    setProducts((prevProducts) => [newProduct, ...prevProducts]);
-  };
-
+  // Delete product
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
     setDeleteModalOpen(true);
@@ -104,7 +93,13 @@ const PharmacyDashboard = () => {
     setProductToDelete(null);
   };
 
-  // Filter products based on search query and filters
+  // View details
+  const handleViewDetails = (product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
+  };
+
+  // Filters
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
@@ -116,29 +111,14 @@ const PharmacyDashboard = () => {
     return matchesSearch && matchesCategory && matchesType;
   });
 
-  // Apply pagination (10 items per page)
+  // Pagination
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + 10);
 
   // Quick stats
   const totalProducts = products.length;
-  const totalOrders = orderCount;
   const totalStock = products.reduce((acc, product) => acc + product.stock, 0);
 
-  // Handle view details (opens the view modal)
-  const handleViewDetails = (product) => {
-    setSelectedProduct(product);
-    setModalOpen(true);
-  };
-
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: noDataAnimation,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
+  // Loading + error handling
   if (loading) {
     return <Loading />;
   }
@@ -153,17 +133,27 @@ const PharmacyDashboard = () => {
     );
   }
 
+  // For "no data" animation
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: noDataAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
     <div className="flex flex-col gap-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-semibold text-gray-800">
-            Pharmacy Dashboard
+            Products Dashboard
           </h1>
         </div>
 
-        {/* User Info */}
+        {/* Admin Info */}
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm font-medium text-gray-700">
@@ -171,7 +161,6 @@ const PharmacyDashboard = () => {
             </p>
             <p className="text-xs text-gray-500">{adminInfo.email}</p>
           </div>
-          {/* Profile Avatar */}
           <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center bg-gray-100">
             <span className="text-gray-600 font-semibold">
               {adminInfo.name.charAt(0).toUpperCase()}
@@ -181,7 +170,7 @@ const PharmacyDashboard = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 cursor-pointer">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Total Products */}
         <div className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105">
           <div className="flex items-center justify-center w-10 h-10 bg-indigo-500 text-white rounded-full shadow-sm mb-2">
@@ -190,17 +179,6 @@ const PharmacyDashboard = () => {
           <h2 className="text-sm font-medium text-gray-600">Total Products</h2>
           <span className="text-xl font-semibold text-indigo-600">
             {totalProducts}
-          </span>
-        </div>
-
-        {/* Total Orders */}
-        <div className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105">
-          <div className="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded-full shadow-sm mb-2">
-            <FaShoppingCart size={22} />
-          </div>
-          <h2 className="text-sm font-medium text-gray-600">Total Orders</h2>
-          <span className="text-xl font-semibold text-red-600">
-            {totalOrders}
           </span>
         </div>
 
@@ -217,7 +195,7 @@ const PharmacyDashboard = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto cursor-pointer">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
         <table className="min-w-full text-sm text-left border-collapse">
           <caption className="mb-4">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -227,11 +205,12 @@ const PharmacyDashboard = () => {
                 </h2>
                 <button
                   onClick={() => setCreateModalOpen(true)}
-                  className="flex items-center gap-2 border border-blue-500 text-blue-500 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-500 hover:text-white transition duration-200 cursor-pointer"
+                  className="flex items-center gap-2 border border-blue-500 text-blue-500 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-500 hover:text-white transition duration-200"
                 >
                   <FaPlus size={14} /> Add Product
                 </button>
               </div>
+
               <div className="flex flex-col md:flex-row md:items-center gap-2">
                 <input
                   type="text"
@@ -345,6 +324,7 @@ const PharmacyDashboard = () => {
             )}
           </tbody>
         </table>
+
         {/* Pagination */}
         <Pagination
           data={filteredProducts}
@@ -352,7 +332,8 @@ const PharmacyDashboard = () => {
           setStartIndex={setStartIndex}
         />
       </div>
-      {/* Product Modal for Viewing */}
+
+      {/* Product Modal */}
       {modalOpen && selectedProduct && (
         <ProductModal
           open={modalOpen}
@@ -360,6 +341,7 @@ const PharmacyDashboard = () => {
           handleClose={() => setModalOpen(false)}
         />
       )}
+
       {/* Edit Product Modal */}
       {editModalOpen && productToEdit && (
         <EditProductModal
@@ -378,6 +360,7 @@ const PharmacyDashboard = () => {
           onProductCreated={handleProductCreated}
         />
       )}
+
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         open={deleteModalOpen}
@@ -388,4 +371,4 @@ const PharmacyDashboard = () => {
   );
 };
 
-export default PharmacyDashboard;
+export default ProductsDashboard;

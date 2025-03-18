@@ -17,8 +17,8 @@ const Sidebar = ({
 }) => {
   const menuItems = [
     { label: "Dashboard", icon: <FaTachometerAlt />, key: "dashboard" },
-    { label: "Users", icon: <FaUsers />, key: "users" },
     { label: "Products", icon: <FaBoxOpen />, key: "products" },
+    { label: "Users", icon: <FaUsers />, key: "users" },
     { label: "Orders", icon: <FaBoxOpen />, key: "orders" },
   ];
 
