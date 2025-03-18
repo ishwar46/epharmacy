@@ -3,13 +3,15 @@ import {
   FaArrowLeft,
   FaBoxOpen,
   FaMapMarkerAlt,
-  FaPhoneAlt,
   FaSyncAlt,
+  FaTruck,
 } from "react-icons/fa";
 import { getOrder } from "../services/orderService";
 import UpdateOrderModal from "../components/UpdateOrderModal.jsx";
 import { formatDate } from "../utils/dateUtils";
 import { getStatusColor } from "../utils/statusUtils";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -79,17 +81,12 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
     fetchOrder();
   }, [fetchOrder]);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
+  if (loading) return <LoadingSpinner />;
+  if (error)
     return (
       <ErrorMessage message={error} onRetry={fetchOrder} actionLabel="Retry" />
     );
-  }
-
-  if (!order) {
+  if (!order)
     return (
       <ErrorMessage
         message="Order not found."
@@ -97,7 +94,6 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
         actionLabel="Back to Orders"
       />
     );
-  }
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm space-y-6">
@@ -123,7 +119,12 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
         </div>
         <button
           onClick={() => setUpdateModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition"
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-md transition ${
+            order.status === "cancelled"
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-yellow-500 text-white hover:bg-yellow-600 cursor-pointer"
+          }`}
+          disabled={order.status === "cancelled"}
           aria-label="Update Order"
         >
           Update Order
@@ -195,39 +196,50 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
         </div>
       </div>
 
-      {/* Shipping & Contact Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Shipping Details */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
-            <FaMapMarkerAlt className="text-green-500" />
-            Shipping Details
+      {/* ✅ Delivery Details */}
+      {order.deliveryPersonName && (
+        <div className="border border-gray-200 rounded-md p-4 space-y-3 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <FaTruck className="text-orange-500" />
+            Delivery Details
           </h3>
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-600">
-            <p>
-              <strong>Address:</strong> {order.shippingAddress?.addressLine1},{" "}
-              {order.shippingAddress?.city}, {order.shippingAddress?.state} -{" "}
-              {order.shippingAddress?.postalCode},{" "}
-              {order.shippingAddress?.country}
-            </p>
-          </div>
+          <p>
+            <strong>Delivery Person:</strong> {order.deliveryPersonName}
+          </p>
+          <p>
+            <strong>Contact:</strong> {order.deliveryPersonContact}
+          </p>
+          <p>
+            <strong>Estimated Arrival Time:</strong>{" "}
+            {order.estimatedArrivalTime}
+          </p>
         </div>
+      )}
 
-        {/* Contact Info */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-2">
-            <FaPhoneAlt className="text-blue-500" />
-            Contact Info
+      {/* Show Customer Signature if available */}
+      {order.customerSignature && (
+        <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Customer Signature
           </h3>
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-4 text-sm text-gray-600">
-            <p>
-              <strong>Phone:</strong> {order.contactInfo?.phone}
-            </p>
-            <p>
-              <strong>Email:</strong> {order.contactInfo?.email}
-            </p>
-          </div>
+          <img
+            src={`${API_BASE_URL}${order.customerSignature}`}
+            alt="Customer Signature"
+            className="max-w-xs max-h-40 object-contain mt-2 rounded-md"
+          />
         </div>
+      )}
+      {/* Shipping Details */}
+      <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
+        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <FaMapMarkerAlt className="text-green-500" />
+          Shipping Address
+        </h3>
+        <p>
+          <strong>Address:</strong> {order.shippingAddress?.addressLine1},{" "}
+          {order.shippingAddress?.city}, {order.shippingAddress?.state} -{" "}
+          {order.shippingAddress?.postalCode}, {order.shippingAddress?.country}
+        </p>
       </div>
 
       {/* Update Order Modal */}

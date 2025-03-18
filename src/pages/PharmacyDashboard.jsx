@@ -75,7 +75,6 @@ const PharmacyDashboard = () => {
     fetchData();
   }, []);
 
-  // Handle Edit - open the edit modal with selected product data
   const handleEdit = (product) => {
     setProductToEdit(product);
     setEditModalOpen(true);

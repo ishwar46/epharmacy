@@ -10,11 +10,14 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
     status: order ? order.status : "",
     paymentStatus: order ? order.paymentStatus : "",
     amountPaid: order ? order.finalPrice : 0,
-    paymentDate:
-      order && order.paymentDate
-        ? toNepalDateString(order.paymentDate)
-        : toNepalDateString(new Date()),
+    paymentDate: order?.paymentDate
+      ? toNepalDateString(order.paymentDate)
+      : toNepalDateString(new Date()),
+    deliveryPersonName: order?.deliveryPersonName || "",
+    deliveryPersonContact: order?.deliveryPersonContact || "",
+    estimatedArrivalTime: order?.estimatedArrivalTime || "",
   });
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,6 +29,9 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
         paymentDate: order.paymentDate
           ? toNepalDateString(order.paymentDate)
           : toNepalDateString(new Date()),
+        deliveryPersonName: order.deliveryPersonName || "",
+        deliveryPersonContact: order.deliveryPersonContact || "",
+        estimatedArrivalTime: order.estimatedArrivalTime || "",
       });
     }
   }, [order]);
@@ -63,7 +69,7 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-300 dark:border-gray-700"
+        className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl border border-gray-300"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-t-xl">
@@ -77,11 +83,9 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
         </div>
 
         {/* Read-Only Order Details */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="mb-2">
-            <label className="block text-gray-700 dark:text-gray-300 text-sm">
-              Order Number:
-            </label>
+        <div className="px-6 py-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-700 text-sm">Order Number:</label>
             <input
               type="text"
               value={order.orderNumber}
@@ -89,8 +93,8 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
               className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
             />
           </div>
-          <div className="mb-2">
-            <label className="block text-gray-700 dark:text-gray-300 text-sm">
+          <div>
+            <label className="block text-gray-700 text-sm">
               Customer Name:
             </label>
             <input
@@ -100,10 +104,8 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
               className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
             />
           </div>
-          <div className="mb-2">
-            <label className="block text-gray-700 dark:text-gray-300 text-sm">
-              Total Price:
-            </label>
+          <div>
+            <label className="block text-gray-700 text-sm">Total Price:</label>
             <input
               type="number"
               value={order.finalPrice}
@@ -115,72 +117,135 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
 
         {/* Update Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              Order Status:
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-            >
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="shipped">Shipped</option>
-              <option value="out for delivery">Out for Delivery</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Order Status */}
+            <div>
+              <label className="block text-gray-700 mb-1">Order Status:</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              >
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="shipped">Shipped</option>
+                <option value="out for delivery">Out for Delivery</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            {/* Payment Status */}
+            <div>
+              <label className="block text-gray-700 mb-1">
+                Payment Status:
+              </label>
+              <select
+                name="paymentStatus"
+                value={formData.paymentStatus}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              >
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+              </select>
+            </div>
+
+            {/* ✅ Customer Signature Upload */}
+            {formData.status === "delivered" && (
+              <div>
+                <label className="block text-gray-700 mb-1">
+                  Customer Signature:
+                </label>
+                <input
+                  type="file"
+                  name="customerSignature"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      customerSignature: e.target.files[0],
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none"
+                />
+              </div>
+            )}
+
+            {/* Amount Paid */}
+            <div>
+              <label className="block text-gray-700 mb-1">Amount Paid:</label>
+              <input
+                type="number"
+                name="amountPaid"
+                value={formData.amountPaid}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              />
+            </div>
+
+            {/* Payment Date */}
+            <div>
+              <label className="block text-gray-700 mb-1">Payment Date:</label>
+              <input
+                type="date"
+                name="paymentDate"
+                value={formData.paymentDate}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              />
+            </div>
+
+            {/* Delivery Person Name */}
+            <div>
+              <label className="block text-gray-700 mb-1">
+                Delivery Person Name:
+              </label>
+              <input
+                type="text"
+                name="deliveryPersonName"
+                value={formData.deliveryPersonName}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              />
+            </div>
+
+            {/* Delivery Person Contact */}
+            <div>
+              <label className="block text-gray-700 mb-1">
+                Delivery Person Contact:
+              </label>
+              <input
+                type="text"
+                name="deliveryPersonContact"
+                value={formData.deliveryPersonContact}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              />
+            </div>
+
+            {/* Estimated Arrival Time */}
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 mb-1">
+                Estimated Arrival Time:
+              </label>
+              <input
+                type="text"
+                name="estimatedArrivalTime"
+                value={formData.estimatedArrivalTime}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              Payment Status:
-            </label>
-            <select
-              name="paymentStatus"
-              value={formData.paymentStatus}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-            >
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              Amount Paid:
-            </label>
-            <input
-              type="number"
-              name="amountPaid"
-              value={formData.amountPaid}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              Payment Date:
-            </label>
-            <input
-              type="date"
-              name="paymentDate"
-              value={formData.paymentDate}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
-            />
-          </div>
+
           <button
             type="submit"
-            className={`w-full py-2 rounded-lg text-white font-medium transition-all ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-500 hover:bg-green-600"
-            }`}
+            className="w-full py-2 rounded-lg text-white font-medium bg-green-500 hover:bg-green-600 transition"
             disabled={loading}
           >
             {loading ? "Updating..." : "Update Order"}
