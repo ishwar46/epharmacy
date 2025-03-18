@@ -2,11 +2,12 @@ import React from "react";
 import {
   FaTachometerAlt,
   FaUsers,
-  FaBoxOpen,
   FaSignOutAlt,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
+  FaBox,
 } from "react-icons/fa";
+import { FaCartFlatbed } from "react-icons/fa6";
 
 const Sidebar = ({
   onSelect,
@@ -17,9 +18,9 @@ const Sidebar = ({
 }) => {
   const menuItems = [
     { label: "Dashboard", icon: <FaTachometerAlt />, key: "dashboard" },
-    { label: "Products", icon: <FaBoxOpen />, key: "products" },
+    { label: "Products", icon: <FaBox />, key: "products" },
     { label: "Users", icon: <FaUsers />, key: "users" },
-    { label: "Orders", icon: <FaBoxOpen />, key: "orders" },
+    { label: "Orders", icon: <FaCartFlatbed />, key: "orders" },
   ];
 
   return (

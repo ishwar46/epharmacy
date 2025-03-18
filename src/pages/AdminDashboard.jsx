@@ -6,6 +6,7 @@ import AdminOrders from "./AdminOrders";
 import AdminOrderDetails from "../components/AdminOrderDetails";
 import { getMe } from "../services/authService";
 import ProductsDashboard from "./ProductsDashboard";
+import UsersDashboard from "./UsersDashboard";
 
 const AdminDashboard = () => {
   const [selectedPage, setSelectedPage] = useState("dashboard");
@@ -63,6 +64,7 @@ const AdminDashboard = () => {
         <div className="p-6">
           {selectedPage === "dashboard" && <PharmacyDashboard />}
           {selectedPage === "products" && <ProductsDashboard />}
+          {selectedPage === "users" && <UsersDashboard />}
           {selectedPage === "orders" && (
             <AdminOrders
               setSelectedOrderId={setSelectedOrderId}

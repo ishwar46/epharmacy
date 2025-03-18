@@ -1,15 +1,23 @@
+// DeleteConfirmationModal.jsx
 import React from "react";
 import { IoClose } from "react-icons/io5";
 
-const DeleteConfirmationModal = ({ open, handleClose, handleConfirm }) => {
+const DeleteConfirmationModal = ({
+  open,
+  handleClose,
+  handleConfirm,
+  title = "Confirm Deletion",
+  message = "Are you sure you want to delete this item? This action cannot be undone.",
+}) => {
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-md w-full p-6">
+        {/* Header */}
         <div className="flex justify-between items-center border-b pb-4">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Confirm Deletion
+            {title}
           </h3>
           <button
             onClick={handleClose}
@@ -19,11 +27,10 @@ const DeleteConfirmationModal = ({ open, handleClose, handleConfirm }) => {
           </button>
         </div>
 
-        <p className="text-gray-700 dark:text-gray-300 mt-4">
-          Are you sure you want to delete this product? This action cannot be
-          undone.
-        </p>
+        {/* Body / Message */}
+        <p className="text-gray-700 dark:text-gray-300 mt-4">{message}</p>
 
+        {/* Footer / Buttons */}
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={handleClose}

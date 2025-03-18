@@ -7,6 +7,7 @@ import AdminOrderDetails from "../components/AdminOrderDetails";
 import AdminRoute from "../components/AdminRoute";
 import NotFound from "../pages/NotFound";
 import ProductsDashboard from "../pages/ProductsDashboard";
+import UsersDashboard from "../pages/UsersDashboard";
 
 const AppRoutes = () => {
   return (
@@ -45,6 +46,14 @@ const AppRoutes = () => {
         element={
           <AdminRoute>
             <ProductsDashboard />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <UsersDashboard />
           </AdminRoute>
         }
       />
