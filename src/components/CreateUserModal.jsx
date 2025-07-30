@@ -1,6 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { IoClose } from "react-icons/io5";
+import {
+  FaUserPlus,
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaMap,
+  FaSearch,
+} from "react-icons/fa";
 import { createUser } from "../services/userService";
 import toast from "react-hot-toast";
 
@@ -67,8 +77,10 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
       }));
 
       setMapCenter({ lat, lng });
+      toast.success("Address located successfully!");
     } catch (error) {
       console.error("Error geocoding address:", error);
+      toast.error("Unable to locate this address");
     }
   };
 
@@ -79,10 +91,14 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
 
     setFormData((prev) => ({ ...prev, lat, lng }));
     setMapCenter({ lat, lng });
+    toast.success("Location updated!");
   }, []);
 
   const handleGeocodeManualAddress = async () => {
-    if (!formData.address) return;
+    if (!formData.address) {
+      toast.error("Please enter an address first");
+      return;
+    }
     try {
       const results = await geocodeByAddress(formData.address);
       const { lat, lng } = await getLatLng(results[0]);
@@ -99,6 +115,22 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
     }
   };
 
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      address: "",
+      role: "customer",
+      lat: null,
+      lng: null,
+    });
+    setAddressSelection(null);
+    setMapCenter({ lat: 27.700769, lng: 85.30014 });
+  };
+
   // -- Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,6 +140,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
       if (resp.success) {
         toast.success(resp.message || "User created successfully!");
         onUserCreated(resp.data);
+        resetForm();
         handleClose();
       } else {
         toast.error(resp.message || "Failed to create user.");
@@ -120,186 +153,311 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
     }
   };
 
+  const handleModalClose = () => {
+    resetForm();
+    handleClose();
+  };
+
   if (!isModalOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative w-full max-w-4xl bg-white rounded-xl shadow-xl"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2 }}
+        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-500 rounded-t-xl">
-          <h3 className="text-lg font-semibold text-white">Add New User</h3>
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border-b border-blue-700 rounded-t-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+              <FaUserPlus className="text-white" size={16} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">
+              Create New User
+            </h3>
+          </div>
           <button
-            onClick={handleClose}
-            className="text-white hover:text-gray-200 transition-all"
+            onClick={handleModalClose}
+            className="text-white hover:text-red-200 hover:bg-white/10 p-2 rounded-lg focus:outline-none transition-all cursor-pointer"
           >
-            <IoClose size={22} />
+            <IoClose size={20} />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-4">
-              {/* Name */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Phone
-                </label>
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Optional phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              {/* Role */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">Role</label>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="customer">Customer</option>
-                  <option value="admin">Admin</option>
-                  <option value="delivery">Delivery</option>
-                </select>
+        {/* Form - Now wraps everything including footer */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          {/* Form Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            {/* Basic Information Section */}
+            <div>
+              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <FaUser className="text-blue-500" size={14} />
+                Basic Information
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaUser className="text-gray-500" size={12} />
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Enter full name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaEnvelope className="text-gray-500" size={12} />
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Enter email address"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaLock className="text-gray-500" size={12} />
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Enter password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaPhone className="text-gray-500" size={12} />
+                      Phone Number
+                    </label>
+                    <input
+                      type="text"
+                      name="phone"
+                      placeholder="Enter phone number (optional)"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaUser className="text-gray-500" size={12} />
+                      User Role *
+                    </label>
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="admin">Admin</option>
+                      <option value="delivery">Delivery</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Right Column: Address + Map */}
-            <div className="flex flex-col gap-4">
-              {/* Google Autocomplete */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Address (Autocomplete)
-                </label>
-                <GooglePlacesAutocomplete
-                  apiKey={import.meta.env.VITE_GOOGLE_PLACES_API}
-                  selectProps={{
-                    placeholder: "Type address...",
-                    value: addressSelection,
-                    onChange: handleAddressSelect,
-                    // isClearable: true,
-                  }}
-                />
-              </div>
+            {/* Address Information Section */}
+            <div>
+              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <FaMapMarkerAlt className="text-green-500" size={14} />
+                Address Information
+              </h5>
 
-              {/* Manual Address Input */}
-              <div>
-                <label className="block text-sm text-gray-700 mb-1">
-                  Or Enter Address Manually
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Manual address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGeocodeManualAddress}
-                    className="px-3 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300"
-                  >
-                    Geocode
-                  </button>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  If Autocomplete doesn’t work, type your address manually here
-                  and optionally click “Geocode”.
-                </p>
-              </div>
-
-              {/* Map Section */}
-              <div className="flex-1 border border-gray-200 rounded">
-                <LoadScript
-                  googleMapsApiKey={import.meta.env.VITE_GOOGLE_PLACES_API}
-                  libraries={["places"]}
-                >
-                  <GoogleMap
-                    mapContainerStyle={{ width: "100%", height: "300px" }}
-                    center={mapCenter}
-                    zoom={14}
-                  >
-                    {/* Draggable Marker */}
-                    {formData.lat && formData.lng && (
-                      <Marker
-                        position={{ lat: formData.lat, lng: formData.lng }}
-                        draggable
-                        onDragEnd={onMarkerDragEnd}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Address Input Column */}
+                <div className="space-y-4">
+                  {/* Google Autocomplete */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaSearch className="text-gray-500" size={12} />
+                      Search Address
+                    </label>
+                    <div className="relative">
+                      <GooglePlacesAutocomplete
+                        apiKey={import.meta.env.VITE_GOOGLE_PLACES_API}
+                        selectProps={{
+                          placeholder: "Type to search address...",
+                          value: addressSelection,
+                          onChange: handleAddressSelect,
+                          styles: {
+                            control: (provided) => ({
+                              ...provided,
+                              padding: "8px",
+                              borderRadius: "12px",
+                              border: "1px solid #d1d5db",
+                              boxShadow: "none",
+                              "&:hover": {
+                                border: "1px solid #d1d5db",
+                              },
+                            }),
+                            placeholder: (provided) => ({
+                              ...provided,
+                              color: "#9ca3af",
+                            }),
+                          },
+                        }}
                       />
-                    )}
-                  </GoogleMap>
-                </LoadScript>
+                    </div>
+                  </div>
+
+                  {/* Manual Address Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <FaMapMarkerAlt className="text-gray-500" size={12} />
+                      Or Enter Manually
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        name="address"
+                        placeholder="Enter address manually"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleGeocodeManualAddress}
+                        className="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors flex items-center gap-2 border border-gray-300"
+                      >
+                        <FaSearch size={12} />
+                        Locate
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      If autocomplete doesn't work, enter your address manually
+                      and click "Locate"
+                    </p>
+                  </div>
+
+                  {/* Coordinates Display */}
+                  {formData.lat && formData.lng && (
+                    <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                      <h6 className="text-sm font-medium text-green-800 mb-2">
+                        Location Coordinates
+                      </h6>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-green-600 font-medium">
+                            Latitude:
+                          </span>
+                          <p className="text-green-800 font-mono">
+                            {formData.lat.toFixed(6)}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-green-600 font-medium">
+                            Longitude:
+                          </span>
+                          <p className="text-green-800 font-mono">
+                            {formData.lng.toFixed(6)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Map Column */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <FaMap className="text-gray-500" size={12} />
+                    Location Map
+                  </label>
+                  <div className="border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                    <LoadScript
+                      googleMapsApiKey={import.meta.env.VITE_GOOGLE_PLACES_API}
+                      libraries={["places"]}
+                    >
+                      <GoogleMap
+                        mapContainerStyle={{ width: "100%", height: "300px" }}
+                        center={mapCenter}
+                        zoom={14}
+                        options={{
+                          styles: [
+                            {
+                              featureType: "poi",
+                              elementType: "labels",
+                              stylers: [{ visibility: "off" }],
+                            },
+                          ],
+                        }}
+                      >
+                        {/* Draggable Marker */}
+                        {formData.lat && formData.lng && (
+                          <Marker
+                            position={{ lat: formData.lat, lng: formData.lng }}
+                            draggable
+                            onDragEnd={onMarkerDragEnd}
+                            title="Drag to adjust location"
+                          />
+                        )}
+                      </GoogleMap>
+                    </LoadScript>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500">
+                    {formData.lat && formData.lng
+                      ? "Drag the marker to fine-tune the location"
+                      : "Search or enter an address to show location on map"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 mt-4 rounded bg-green-600 text-white hover:bg-green-700 transition"
-          >
-            {loading ? "Creating..." : "Create User"}
-          </button>
+          {/* Footer - Now inside form */}
+          <div className="flex justify-between items-center px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <button
+              type="button"
+              onClick={handleModalClose}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <FaUserPlus size={14} />
+                  Create User
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </motion.div>
     </div>
