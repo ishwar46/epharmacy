@@ -38,6 +38,18 @@ const AdminDashboard = () => {
     navigate("/login");
   };
 
+  // Handle order selection - this should only be called when user clicks on a specific order
+  const handleOrderSelect = (orderId) => {
+    setSelectedOrderId(orderId);
+    setSelectedPage("orderDetails");
+  };
+
+  // Handle going back from order details to orders list
+  const handleBackToOrders = () => {
+    setSelectedOrderId(null);
+    setSelectedPage("orders");
+  };
+
   const sidebarWidth = isCollapsed ? "w-20" : "w-64";
   const contentMargin = isCollapsed ? "ml-20" : "ml-64";
 
@@ -66,15 +78,12 @@ const AdminDashboard = () => {
           {selectedPage === "products" && <ProductsDashboard />}
           {selectedPage === "users" && <UsersDashboard />}
           {selectedPage === "orders" && (
-            <AdminOrders
-              setSelectedOrderId={setSelectedOrderId}
-              onSelect={() => setSelectedPage("orderDetails")}
-            />
+            <AdminOrders onOrderSelect={handleOrderSelect} />
           )}
           {selectedPage === "orderDetails" && selectedOrderId && (
             <AdminOrderDetails
               orderId={selectedOrderId}
-              goBack={() => setSelectedPage("orders")}
+              goBack={handleBackToOrders}
             />
           )}
         </div>

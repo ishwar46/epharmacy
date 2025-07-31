@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getMe } from "../services/authService";
 import { getOrders } from "../services/orderService";
 import { ORDER_STATUS } from "../constants/status";
 import {
   FaEye,
   FaClipboardList,
-  FaTruck,
   FaCheckCircle,
-  FaTimesCircle,
+  FaShoppingCart,
+  FaSearch,
+  FaFilter,
 } from "react-icons/fa";
 import Pagination from "../components/Paginations";
 import Lottie from "react-lottie";
@@ -15,198 +18,465 @@ import { formatDate } from "../utils/dateUtils";
 import { getStatusColor } from "../utils/statusUtils";
 import Loading from "../components/Loading";
 
-const AdminOrders = ({ setSelectedOrderId, onSelect }) => {
-  const [orders, setOrders] = useState([]);
+const AdminOrders = ({ onOrderSelect }) => {
+  const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+
+  // Filter/search states
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Pagination state
   const [startIndex, setStartIndex] = useState(0);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await getOrders();
-        console.log("Orders API response:", response.data);
-        const fetchedOrders = response.data.data || response.data;
-        setOrders(fetchedOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const navigate = useNavigate();
 
-    fetchOrders();
+  // Fetch admin info and orders
+  const fetchData = async () => {
+    try {
+      // 1) Get admin info
+      const meResponse = await getMe();
+      setAdminInfo(meResponse.data);
+
+      // 2) Get orders
+      const ordersResponse = await getOrders();
+      console.log("Orders API response:", ordersResponse.data);
+      const fetchedOrders = ordersResponse.data.data || ordersResponse.data;
+      setOrders(fetchedOrders);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
+  // Handle order click - this will call the parent's onOrderSelect function
+  const handleOrderClick = (orderId) => {
+    if (onOrderSelect) {
+      onOrderSelect(orderId);
+    }
+  };
 
-  if (orders.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <div className="w-48 h-48">
-          <Lottie
-            options={{
-              loop: true,
-              autoplay: true,
-              animationData: noDataAnimation,
-              rendererSettings: { preserveAspectRatio: "xMidYMid slice" },
-            }}
-            height={150}
-            width={150}
-          />
-        </div>
-        <p className="text-gray-500 font-medium mt-2">No Orders Found</p>
-      </div>
-    );
-  }
-
-  // Quick stats for all statuses
-  const statusCounts = ORDER_STATUS.reduce((acc, status) => {
-    acc[status] = orders.filter((o) => o.status === status).length;
-    return acc;
-  }, {});
-
-  // Filter orders based on search query and status
+  // Filters
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.orderNumber
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    // Safe search with null checks
+    const orderNumber = order.orderNumber || order._id || "";
+    const customerName = order.user?.name || "";
+    const customerEmail = order.user?.email || "";
+
+    const matchesSearch =
+      orderNumber
+        .toString()
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customerEmail.toLowerCase().includes(searchQuery.toLowerCase());
+
     const matchesStatus =
       statusFilter === "All" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  // Apply pagination (10 items per page)
+  // Pagination
   const paginatedOrders = filteredOrders.slice(startIndex, startIndex + 10);
 
+  // Quick stats
+  const totalOrders = orders.length;
+  const pendingOrders = orders.filter(
+    (order) => order.status === "pending"
+  ).length;
+  const deliveredOrders = orders.filter(
+    (order) => order.status === "delivered"
+  ).length;
+  const totalRevenue = orders.reduce(
+    (acc, order) => acc + (order.finalPrice || order.totalPrice || 0),
+    0
+  );
+
+  // Loading + error handling
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!adminInfo) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-500 text-2xl">!</span>
+          </div>
+          <p className="text-gray-600">Failed to load admin information</p>
+        </div>
+      </div>
+    );
+  }
+
+  // For "no data" animation
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: noDataAnimation,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
-    <div className="flex flex-col gap-5 cursor-pointer">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Orders Dashboard
-        </h1>
-      </div>
-
-      {/* Quick Stats for all Order Statuses */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 cursor-pointer">
-        {ORDER_STATUS.map((status) => {
-          let icon = null;
-          if (status === "pending") icon = <FaClipboardList size={22} />;
-          if (status === "processing") icon = <FaTruck size={22} />;
-          if (status === "confirmed") icon = <FaCheckCircle size={22} />;
-          if (status === "shipped") icon = <FaTruck size={22} />;
-          if (status === "out for delivery") icon = <FaTruck size={22} />;
-          if (status === "delivered") icon = <FaCheckCircle size={22} />;
-          if (status === "cancelled") icon = <FaTimesCircle size={22} />;
-
-          return (
-            <div
-              key={status}
-              className="flex flex-col items-center bg-white hover:shadow-md rounded-lg p-4 border border-gray-200 transition-all duration-200 transform hover:scale-105"
-            >
-              <div
-                className={`flex items-center justify-center w-10 h-10 ${getStatusColor(
-                  status
-                )} text-white rounded-full shadow-sm mb-2`}
-              >
-                {icon}
-              </div>
-              <h2 className="text-sm font-medium text-gray-600 capitalize">
-                {status}
-              </h2>
-              <span className="text-xl font-semibold text-gray-800">
-                {statusCounts[status]}
-              </span>
+    <div className="min-h-screen">
+      <div className="max px-4 sm:px-6 lg:px-4 py-0 space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+              <p className="text-gray-500 text-sm mt-1">
+                Manage customer orders and delivery status
+              </p>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Filter Section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search by order number"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-3 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        <select
-          onChange={(e) => setStatusFilter(e.target.value)}
-          value={statusFilter}
-          className="border border-gray-200 text-sm rounded-md py-2 px-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option value="All">All Status</option>
-          {ORDER_STATUS.map((status, index) => (
-            <option key={index} value={status}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </option>
-          ))}
-        </select>
-      </div>
+            {/* User Info */}
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">
+                  {adminInfo.name}
+                </p>
+                <p className="text-xs text-gray-500">{adminInfo.email}</p>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">
+                  {adminInfo.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
-        <table className="min-w-full text-sm text-left border-collapse">
-          <thead className="bg-green-600 text-white">
-            <tr>
-              <th className="p-3 font-medium">SN</th>
-              <th className="p-3 font-medium">Order Number</th>
-              <th className="p-3 font-medium">Customer</th>
-              <th className="p-3 font-medium">Email</th>
-              <th className="p-3 font-medium text-right">Total Price</th>
-              <th className="p-3 font-medium">Status</th>
-              <th className="p-3 font-medium">Order Date</th>
-              <th className="p-3 font-medium text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {paginatedOrders.map((order, index) => (
-              <tr key={order._id} className="hover:bg-gray-50 transition">
-                <td className="p-3">{startIndex + index + 1}</td>
-                <td className="p-3">{order.orderNumber}</td>
-                <td className="p-3">{order.user.name}</td>
-                <td className="p-3">{order.user.email}</td>
-                <td className="p-3 text-right text-green-600 font-semibold">
-                  Rs. {order.finalPrice}
-                </td>
-                <td className="p-3">
-                  <span
-                    className={`px-3 py-1 text-xs text-white font-semibold rounded-full ${getStatusColor(
-                      order.status
-                    )}`}
-                  >
-                    {order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)}
-                  </span>
-                </td>
-                <td className="p-3">{formatDate(order.createdAt)}</td>
-                <td className="p-3 flex justify-center">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Orders */}
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Total Orders
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {totalOrders}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <FaShoppingCart className="text-blue-500" size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Orders */}
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Pending Orders
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {pendingOrders}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+                <FaClipboardList className="text-yellow-500" size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Delivered Orders */}
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Delivered</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {deliveredOrders}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                <FaCheckCircle className="text-green-500" size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Revenue */}
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Total Revenue
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  Rs. {totalRevenue.toLocaleString()}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                <FaShoppingCart className="text-purple-500" size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Orders Section */}
+        <div className="bg-white rounded-sm shadow-sm border border-gray-100">
+          {/* Header */}
+          <div className="p-6 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900">Orders List</h2>
+                <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded-lg text-xs font-medium">
+                  {filteredOrders.length}
+                </span>
+              </div>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="mt-4 space-y-3">
+              {/* Search Bar */}
+              <div className="relative">
+                <FaSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  placeholder="Search orders, customers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Filter Toggle Button (Mobile) */}
+              <div className="flex items-center justify-between sm:hidden">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 text-gray-600 font-medium"
+                >
+                  <FaFilter size={14} />
+                  Filters
+                </button>
+                {statusFilter !== "All" && (
                   <button
-                    onClick={() => {
-                      setSelectedOrderId(order._id);
-                      onSelect();
-                    }}
-                    className="inline-flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 cursor-pointer"
+                    onClick={() => setStatusFilter("All")}
+                    className="text-xs text-blue-500"
                   >
-                    <FaEye /> View
+                    Clear
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <Pagination
-          data={filteredOrders}
-          startIndex={startIndex}
-          setStartIndex={setStartIndex}
-        />
+                )}
+              </div>
+
+              {/* Filters */}
+              <div
+                className={`flex flex-col sm:flex-row gap-3 ${
+                  showFilters ? "block" : "hidden sm:flex"
+                }`}
+              >
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="All">All Status</option>
+                  {ORDER_STATUS.map((status) => (
+                    <option key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Orders List */}
+          <div className="p-6">
+            {paginatedOrders.length > 0 ? (
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
+                          #
+                        </th>
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
+                          Order
+                        </th>
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
+                          Customer
+                        </th>
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
+                          Status
+                        </th>
+                        <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">
+                          Amount
+                        </th>
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
+                          Date
+                        </th>
+                        <th className="text-center py-3 px-2 text-sm font-medium text-gray-500">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {paginatedOrders.map((order, index) => (
+                        <tr key={order._id} className="hover:bg-gray-25">
+                          <td className="py-4 px-2 text-sm text-gray-500">
+                            {startIndex + index + 1}
+                          </td>
+                          <td className="py-4 px-2">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {order.orderNumber || `#${order._id.slice(-6)}`}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="py-4 px-2">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {order.user?.name || "N/A"}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {order.user?.email || "N/A"}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="py-4 px-2">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-lg text-white ${getStatusColor(
+                                order.status
+                              )}`}
+                            >
+                              {order.status
+                                ? order.status.charAt(0).toUpperCase() +
+                                  order.status.slice(1)
+                                : "Unknown"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-2 text-right font-medium text-gray-900">
+                            Rs.{" "}
+                            {(
+                              order.finalPrice ||
+                              order.totalPrice ||
+                              0
+                            ).toLocaleString()}
+                          </td>
+                          <td className="py-4 px-2 text-sm text-gray-600">
+                            {formatDate(order.createdAt)}
+                          </td>
+                          <td className="py-4 px-2">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => handleOrderClick(order._id)}
+                                className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <FaEye size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden space-y-4">
+                  {paginatedOrders.map((order, index) => (
+                    <div key={order._id} className="bg-gray-50 rounded-xl p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 truncate">
+                            {order.orderNumber || `#${order._id.slice(-6)}`}
+                          </h3>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {order.user?.name || "N/A"}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {order.user?.email || "N/A"}
+                          </p>
+                        </div>
+                        <span
+                          className={`ml-3 inline-flex px-2 py-1 text-xs font-medium rounded-lg text-white ${getStatusColor(
+                            order.status
+                          )}`}
+                        >
+                          {order.status
+                            ? order.status.charAt(0).toUpperCase() +
+                              order.status.slice(1)
+                            : "Unknown"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="text-gray-500">Amount:</span>
+                          <span className="font-medium text-gray-900">
+                            Rs.{" "}
+                            {(
+                              order.finalPrice ||
+                              order.totalPrice ||
+                              0
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500 text-sm">Date:</span>
+                          <span className="text-sm text-gray-600">
+                            {formatDate(order.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end">
+                        <button
+                          onClick={() => handleOrderClick(order._id)}
+                          className="p-2 text-gray-400 hover:text-blue-500 hover:bg-white rounded-lg transition-colors"
+                        >
+                          <FaEye size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-32 h-32 mx-auto">
+                  <Lottie options={defaultOptions} height={128} width={128} />
+                </div>
+                <p className="text-gray-500 font-medium mt-4">
+                  No orders found
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Try adjusting your search or filters
+                </p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {filteredOrders.length > 10 && (
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <Pagination
+                  data={filteredOrders}
+                  startIndex={startIndex}
+                  setStartIndex={setStartIndex}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
