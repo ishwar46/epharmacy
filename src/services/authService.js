@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5500/api/auth";
+const API_URL = "https://epharmacy-api.onrender.com/api/auth";
 
 // Logs the user in by making a POST request to /login
 export const login = async (email, password) => {
