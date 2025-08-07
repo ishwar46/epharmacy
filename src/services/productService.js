@@ -1,91 +1,222 @@
-import axios from "axios";
-import { getAuthHeaders } from "./authService";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_URL = `${API_BASE_URL}/api/products`;
-
-// Fetch all products
-export const getProducts = async () => {
-    const response = await axios.get(API_URL, getAuthHeaders());
-    return response.data;
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+    };
 };
 
-// Fetch single product
+const getAuthHeadersMultipart = () => {
+    const token = localStorage.getItem('token');
+    return {
+        'Authorization': `Bearer ${token}`,
+    };
+};
+
+// Get all products with filters
+export const getProducts = async (filters = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        Object.keys(filters).forEach(key => {
+            if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+                queryParams.append(key, filters[key]);
+            }
+        });
+
+        const queryString = queryParams.toString();
+        const url = `${API_BASE_URL}/api/products${queryString ? `?${queryString}` : ''}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+    }
+};
+
+// Get single product
 export const getProduct = async (id) => {
-    const response = await axios.get(`${API_URL}/${id}`, getAuthHeaders());
-    return response.data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        throw error;
+    }
 };
 
-// Create product (with images)
+// Create new product
 export const createProduct = async (productData) => {
-    const formData = new FormData();
+    try {
+        const formData = new FormData();
 
-    // Append text fields
-    formData.append("sku", productData.sku);
-    formData.append("name", productData.name);
-    formData.append("brand", productData.brand);
-    formData.append("description", productData.description);
-    formData.append("dosage", productData.dosage);
-    formData.append("price", productData.price);
-    formData.append("stock", productData.stock);
-    formData.append("category", productData.category);
-    formData.append("medicineType", productData.medicineType);
+        // Append all form fields except images
+        Object.keys(productData).forEach(key => {
+            if (key !== 'images') {
+                formData.append(key, productData[key]);
+            }
+        });
 
-    // Append images (if any)
-    if (productData.images && productData.images.length) {
-        for (const file of productData.images) {
-            formData.append("images", file);
+        // Append images
+        if (productData.images && productData.images.length > 0) {
+            productData.images.forEach(image => {
+                formData.append('images', image);
+            });
         }
+
+        const response = await fetch(`${API_BASE_URL}/api/products`, {
+            method: 'POST',
+            headers: getAuthHeadersMultipart(),
+            body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('Error creating product:', error);
+        throw error;
     }
-
-    // Configure headers
-    const config = {
-        ...getAuthHeaders(),
-        headers: {
-            ...getAuthHeaders().headers,
-            "Content-Type": "multipart/form-data",
-        },
-    };
-
-    const response = await axios.post(API_URL, formData, config);
-    return response.data;
 };
 
-export const updateProduct = async (productId, productData) => {
-    const formData = new FormData();
+// Update product
+export const updateProduct = async (id, productData) => {
+    try {
+        const formData = new FormData();
 
-    // Append text fields
-    formData.append("sku", productData.sku);
-    formData.append("name", productData.name);
-    formData.append("brand", productData.brand);
-    formData.append("description", productData.description);
-    formData.append("dosage", productData.dosage);
-    formData.append("price", productData.price);
-    formData.append("stock", productData.stock);
-    formData.append("category", productData.category);
-    formData.append("medicineType", productData.medicineType);
+        // Append all form fields except images and existingImages
+        Object.keys(productData).forEach(key => {
+            if (key !== 'images' && key !== 'existingImages') {
+                formData.append(key, productData[key]);
+            }
+        });
 
-    // Append new images (if any)
-    if (productData.images && productData.images.length) {
-        for (const file of productData.images) {
-            formData.append("images", file);
+        // Handle existing images
+        if (productData.existingImages) {
+            formData.append('existingImages', JSON.stringify(productData.existingImages));
         }
+
+        // Append new images
+        if (productData.images && productData.images.length > 0) {
+            productData.images.forEach(image => {
+                formData.append('images', image);
+            });
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeadersMultipart(),
+            body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('Error updating product:', error);
+        throw error;
     }
-
-    const config = {
-        ...getAuthHeaders(),
-        headers: {
-            ...getAuthHeaders().headers,
-            "Content-Type": "multipart/form-data",
-        },
-    };
-
-    const response = await axios.put(`${API_URL}/${productId}`, formData, config);
-    return response.data;
 };
 
-// Delete product
-export const deleteProduct = async (productId) => {
-    const response = await axios.delete(`${API_URL}/${productId}`, getAuthHeaders());
-    return response.data;
+// Update product stock only
+export const updateProductStock = async (id, stock) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/products/${id}/stock`, {
+            method: 'PATCH',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ stock }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('Error updating stock:', error);
+        throw error;
+    }
+};
+
+// Delete product (soft delete)
+export const deleteProduct = async (id) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        throw error;
+    }
+};
+
+// Get low stock products (Admin only)
+export const getLowStockProducts = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/products/admin/low-stock`, {
+            headers: getAuthHeaders(),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching low stock products:', error);
+        throw error;
+    }
+};
+
+// Search products
+export const searchProducts = async (searchQuery, filters = {}) => {
+    try {
+        const queryParams = new URLSearchParams({
+            q: searchQuery,
+            ...filters
+        });
+
+        const response = await fetch(`${API_BASE_URL}/api/products/search?${queryParams}`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error searching products:', error);
+        throw error;
+    }
 };

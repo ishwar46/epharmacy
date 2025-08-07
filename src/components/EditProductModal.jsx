@@ -1,172 +1,136 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { IoClose } from "react-icons/io5";
-import {
-  FaEdit,
-  FaBox,
-  FaTag,
-  FaImage,
-  FaTimes,
-  FaUpload,
-  FaTrash,
-} from "react-icons/fa";
-import { updateProduct } from "../services/productService";
+import React, { useState, useEffect } from "react";
+import { FaEdit, FaTimes, FaUpload } from "react-icons/fa";
 import toast from "react-hot-toast";
-import categories from "../constants/categories";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { updateProduct } from "../services/productService";
+import CATEGORIES from "../constants/categories";
 
 const EditProductModal = ({ open, product, handleClose, onUpdate }) => {
-  const [isModalOpen, setIsModalOpen] = useState(open);
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
-    sku: "",
     name: "",
-    brand: "",
     description: "",
-    dosage: "",
-    price: "",
-    stock: "",
+    brand: "",
     category: "",
     medicineType: "OTC",
-    images: [],
+    productType: "tablet",
+    unitsPerStrip: 10,
+    price: "",
+    stock: "",
+    manufacturer: "",
+    activeIngredient: "",
+    dosage: "",
   });
 
-  // Local previews for newly selected files
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
-  const [dragActive, setDragActive] = useState(false);
 
+  // Populate form when product changes
   useEffect(() => {
-    setIsModalOpen(open);
     if (product) {
       setFormData({
-        sku: product.sku || "",
         name: product.name || "",
-        brand: product.brand || "",
         description: product.description || "",
-        dosage: product.dosage || "",
-        price: product.price || "",
-        stock: product.stock || "",
+        brand: product.brand || "",
         category: product.category || "",
         medicineType: product.medicineType || "OTC",
-        images: [],
+        productType: product.productType || "tablet",
+        unitsPerStrip: product.unitsPerStrip || 10,
+        price: product.price || "",
+        stock: product.stock || "",
+        manufacturer: product.manufacturer || "",
+        activeIngredient: product.activeIngredient || "",
+        dosage: product.dosage || "",
       });
+
+      setExistingImages(product.images || []);
+      setNewImages([]);
+      // Clean up old preview URLs
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
       setPreviewUrls([]);
     }
-  }, [open, product]);
+  }, [product]);
 
-  // Cleanup object URLs
+  // Cleanup preview URLs on unmount
   useEffect(() => {
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [previewUrls]);
+  }, []);
 
-  // Text input handler
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  // Handle file selection
   const handleFileChange = (e) => {
-    const newFiles = Array.from(e.target.files);
-    processFiles(newFiles);
-  };
-
-  // Process files (for both file input and drag-drop)
-  const processFiles = (newFiles) => {
-    const combined = [...formData.images, ...newFiles];
-    if (combined.length > 5) {
-      toast.error("You cannot upload more than 5 images");
+    const files = Array.from(e.target.files);
+    if (files.length + existingImages.length + newImages.length > 5) {
+      toast.error("Maximum 5 images allowed");
       return;
     }
-    setFormData((prev) => ({ ...prev, images: combined }));
 
-    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    setNewImages((prev) => [...prev, ...files]);
+
+    // Create preview URLs
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviewUrls((prev) => [...prev, ...newPreviews]);
   };
 
-  // Drag handlers
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+  const removeExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const files = Array.from(e.dataTransfer.files).filter((file) =>
-        file.type.startsWith("image/")
-      );
-      if (files.length > 0) {
-        processFiles(files);
-      }
-    }
+  const removeNewImage = (index) => {
+    URL.revokeObjectURL(previewUrls[index]);
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Remove a preview
-  const removePreview = (index) => {
-    setPreviewUrls((prev) => {
-      const updated = [...prev];
-      const [removedUrl] = updated.splice(index, 1);
-      URL.revokeObjectURL(removedUrl);
-      return updated;
-    });
-    setFormData((prev) => {
-      const updatedFiles = [...prev.images];
-      updatedFiles.splice(index, 1);
-      return { ...prev, images: updatedFiles };
-    });
-  };
-
-  // Reset form
   const resetForm = () => {
-    if (product) {
-      setFormData({
-        sku: product.sku || "",
-        name: product.name || "",
-        brand: product.brand || "",
-        description: product.description || "",
-        dosage: product.dosage || "",
-        price: product.price || "",
-        stock: product.stock || "",
-        category: product.category || "",
-        medicineType: product.medicineType || "OTC",
-        images: [],
-      });
-    }
+    setFormData({
+      name: "",
+      description: "",
+      brand: "",
+      category: "",
+      medicineType: "OTC",
+      productType: "tablet",
+      unitsPerStrip: 10,
+      price: "",
+      stock: "",
+      manufacturer: "",
+      activeIngredient: "",
+      dosage: "",
+    });
+    setExistingImages([]);
+    setNewImages([]);
     previewUrls.forEach((url) => URL.revokeObjectURL(url));
     setPreviewUrls([]);
   };
 
-  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!product?._id) return;
     setLoading(true);
+
     try {
-      const resp = await updateProduct(product._id, formData);
-      if (resp.success) {
-        toast.success(resp.message || "Product updated successfully!");
-        resetForm();
-        onUpdate();
-        handleClose();
-      } else {
-        toast.error(resp.message || "Failed to update product.");
-      }
+      const submitData = {
+        ...formData,
+        existingImages: existingImages,
+        images: newImages,
+      };
+
+      const result = await updateProduct(product._id, submitData);
+
+      toast.success("Product updated successfully!");
+      onUpdate();
+      handleClose();
     } catch (error) {
-      console.error("Update error:", error);
-      toast.error("Error updating product.");
+      console.error("Error updating product:", error);
+      toast.error(error.message || "Failed to update product");
     } finally {
       setLoading(false);
     }
@@ -177,292 +141,334 @@ const EditProductModal = ({ open, product, handleClose, onUpdate }) => {
     handleClose();
   };
 
-  if (!isModalOpen || !product) return null;
+  if (!open || !product) return null;
+
+  const getPriceLabel = () => {
+    if (
+      formData.productType === "tablet" ||
+      formData.productType === "capsule"
+    ) {
+      return `Price per strip (${formData.unitsPerStrip} ${formData.productType}s)`;
+    } else if (formData.productType === "syrup") {
+      return "Price per bottle";
+    }
+    return "Price per unit";
+  };
+
+  const getStockLabel = () => {
+    if (
+      formData.productType === "tablet" ||
+      formData.productType === "capsule"
+    ) {
+      return "Stock (number of strips)";
+    } else if (formData.productType === "syrup") {
+      return "Stock (number of bottles)";
+    }
+    return "Stock quantity";
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.2 }}
-        className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl max-h-[90vh] flex flex-col"
-      >
+      <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 border-b border-blue-700 rounded-t-xl">
+        <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <FaEdit className="text-white" size={16} />
-            </div>
-            <h3 className="text-lg font-semibold text-white">Edit Product</h3>
+            <FaEdit className="text-green-500" size={20} />
+            <h3 className="text-lg font-semibold text-gray-900">
+              Edit Product
+            </h3>
           </div>
           <button
             onClick={handleModalClose}
-            className="text-white hover:text-red-200 hover:bg-white/10 p-2 rounded-lg focus:outline-none transition-all cursor-pointer"
+            className="text-gray-400 hover:text-gray-600 p-1"
           >
-            <IoClose size={20} />
+            <FaTimes size={18} />
           </button>
         </div>
 
-        {/* Form - Now wraps everything including footer */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          {/* Form Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
-            {/* Basic Information Section */}
-            <div>
-              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
-                <FaBox className="text-blue-500" size={14} />
-                Basic Information
-              </h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Enter product name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Brand *
-                    </label>
-                    <input
-                      type="text"
-                      name="brand"
-                      placeholder="Enter brand name"
-                      value={formData.brand}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      SKU *
-                    </label>
-                    <input
-                      type="text"
-                      name="sku"
-                      placeholder="Enter SKU"
-                      value={formData.sku}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category *
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Medicine Type *
-                    </label>
-                    <select
-                      name="medicineType"
-                      value={formData.medicineType}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    >
-                      <option value="OTC">OTC (Over The Counter)</option>
-                      <option value="Prescription">Prescription</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dosage *
-                    </label>
-                    <input
-                      type="text"
-                      name="dosage"
-                      placeholder="e.g., 500mg, 10ml"
-                      value={formData.dosage}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                </div>
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="overflow-y-auto max-h-[calc(90vh-140px)]"
+        >
+          <div className="p-6 space-y-4">
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., Paracetamol 500mg"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Brand *
+                </label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={formData.brand}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., Himalaya"
+                />
               </div>
             </div>
 
-            {/* Description Section */}
             <div>
-              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">
-                Description
-              </h5>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description *
+              </label>
               <textarea
                 name="description"
-                placeholder="Enter detailed product description"
                 value={formData.description}
                 onChange={handleChange}
                 required
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-vertical"
+                rows="3"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                placeholder="Product description..."
               />
             </div>
 
-            {/* Pricing & Inventory Section */}
-            <div>
-              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
-                <FaTag className="text-green-500" size={14} />
-                Pricing & Inventory
-              </h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price (Rs.) *
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    placeholder="0.00"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                    min="0"
-                    step="0.01"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Quantity *
-                  </label>
-                  <input
-                    type="number"
-                    name="stock"
-                    placeholder="0"
-                    value={formData.stock}
-                    onChange={handleChange}
-                    required
-                    min="0"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  />
-                </div>
+            {/* Category and Type */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Category *
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Select Category</option>
+                  {CATEGORIES.map((category, index) => (
+                    <option key={index} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Medicine Type
+                </label>
+                <select
+                  name="medicineType"
+                  value={formData.medicineType}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="OTC">Over the Counter (OTC)</option>
+                  <option value="Prescription">Prescription Only</option>
+                </select>
               </div>
             </div>
 
-            {/* Current Images Section */}
-            {product.images && product.images.length > 0 && (
+            {/* Product Type and Units */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
-                  <FaImage className="text-purple-500" size={14} />
-                  Current Images
-                </h5>
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    {product.images.map((imgPath, idx) => (
-                      <div key={idx} className="relative group">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Type *
+                </label>
+                <select
+                  name="productType"
+                  value={formData.productType}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="tablet">Tablet</option>
+                  <option value="capsule">Capsule</option>
+                  <option value="syrup">Syrup</option>
+                  <option value="cream">Cream/Ointment</option>
+                  <option value="injection">Injection</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {(formData.productType === "tablet" ||
+                formData.productType === "capsule") && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Units per Strip
+                  </label>
+                  <input
+                    type="number"
+                    name="unitsPerStrip"
+                    value={formData.unitsPerStrip}
+                    onChange={handleChange}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Price and Stock */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {getPriceLabel()} *
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {getStockLabel()} *
+                </label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
+            {/* Optional Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Dosage
+                </label>
+                <input
+                  type="text"
+                  name="dosage"
+                  value={formData.dosage}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., 500mg"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Active Ingredient
+                </label>
+                <input
+                  type="text"
+                  name="activeIngredient"
+                  value={formData.activeIngredient}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., Paracetamol"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Manufacturer
+              </label>
+              <input
+                type="text"
+                name="manufacturer"
+                value={formData.manufacturer}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            {/* Image Management */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Images (up to 5)
+              </label>
+
+              {/* Existing Images */}
+              {existingImages.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">Current Images:</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {existingImages.map((img, index) => (
+                      <div key={index} className="relative">
                         <img
                           src={
-                            imgPath.startsWith("http")
-                              ? imgPath
-                              : `${API_BASE_URL}${imgPath}`
+                            img.startsWith("http")
+                              ? img
+                              : `${import.meta.env.VITE_API_BASE_URL}${img}`
                           }
-                          alt={`Current image ${idx + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border border-gray-300 shadow-sm"
+                          alt={`Current ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border"
                         />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors" />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          ×
+                        </button>
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-3 italic">
-                    Current product images. Add new images below to append to
-                    existing ones.
-                  </p>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Add New Images Section */}
-            <div>
-              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
-                <FaUpload className="text-orange-500" size={14} />
-                Add New Images
-              </h5>
-
-              {/* Drag and Drop Area */}
-              <div
-                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all ${
-                  dragActive
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-              >
+              {/* Add New Images */}
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                 <input
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handleFileChange}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="hidden"
+                  id="new-image-upload"
                 />
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    <FaUpload className="text-gray-500" size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      Drop new images here or click to browse
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Support JPG, PNG, GIF up to 10MB each (max 5 total)
-                    </p>
-                  </div>
-                </div>
+                <label htmlFor="new-image-upload" className="cursor-pointer">
+                  <FaUpload className="mx-auto text-gray-400 mb-2" size={24} />
+                  <p className="text-sm text-gray-600">Add new images</p>
+                  <p className="text-xs text-gray-400">
+                    JPG, PNG up to 10MB each
+                  </p>
+                </label>
               </div>
 
               {/* New Image Previews */}
               {previewUrls.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm font-medium text-gray-700 mb-3">
-                    New Images to Add ({previewUrls.length}/5)
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    {previewUrls.map((url, idx) => (
-                      <div key={idx} className="relative group">
+                <div className="mt-3">
+                  <p className="text-sm text-gray-600 mb-2">New Images:</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {previewUrls.map((url, index) => (
+                      <div key={index} className="relative">
                         <img
                           src={url}
-                          alt={`New preview ${idx + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border border-gray-200 shadow-sm"
+                          alt={`New ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border"
                         />
                         <button
                           type="button"
-                          onClick={() => removePreview(idx)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                          onClick={() => removeNewImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                         >
-                          <FaTimes size={10} />
+                          ×
                         </button>
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors" />
                       </div>
                     ))}
                   </div>
@@ -471,19 +477,19 @@ const EditProductModal = ({ open, product, handleClose, onUpdate }) => {
             </div>
           </div>
 
-          {/* Footer - Now inside form */}
-          <div className="flex justify-between items-center px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+          {/* Footer */}
+          <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
             <button
               type="button"
               onClick={handleModalClose}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-lg transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2 ${
+              className={`px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 flex items-center gap-2 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -501,7 +507,7 @@ const EditProductModal = ({ open, product, handleClose, onUpdate }) => {
             </button>
           </div>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 };
