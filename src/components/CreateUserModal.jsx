@@ -200,7 +200,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                       <FaUser className="text-gray-500" size={12} />
                       Full Name *
                     </label>
@@ -215,7 +215,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaEnvelope className="text-gray-500" size={12} />
                       Email Address *
                     </label>
@@ -230,7 +230,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaLock className="text-gray-500" size={12} />
                       Password *
                     </label>
@@ -247,7 +247,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaPhone className="text-gray-500" size={12} />
                       Phone Number
                     </label>
@@ -261,7 +261,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaUser className="text-gray-500" size={12} />
                       User Role *
                     </label>
@@ -292,7 +292,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
                 <div className="space-y-4">
                   {/* Google Autocomplete */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaSearch className="text-gray-500" size={12} />
                       Search Address
                     </label>
@@ -326,7 +326,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
 
                   {/* Manual Address Input */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                       <FaMapMarkerAlt className="text-gray-500" size={12} />
                       Or Enter Manually
                     </label>
@@ -384,7 +384,7 @@ const CreateUserModal = ({ open, handleClose, onUserCreated }) => {
 
                 {/* Map Column */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                     <FaMap className="text-gray-500" size={12} />
                     Location Map
                   </label>

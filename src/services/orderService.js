@@ -1,8 +1,8 @@
 import axios from "axios";
 import { getAuthHeaders } from "./authService";
 
-const API_URL = "https://epharmacy-api.onrender.com/api/admin/orders";
-// https://epharmacy-api.onrender.com/api/auth
+const API_URL = "http://localhost:5500/api/admin/orders";
+// http://localhost:5500/api/auth
 
 // Fetch all orders (Admin View)
 export const getOrders = async () => {
