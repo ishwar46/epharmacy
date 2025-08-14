@@ -31,15 +31,29 @@ const Login = () => {
       const data = await login(email, password);
       console.log("Login successful:", data);
 
-      localStorage.setItem("token", data.data.token);
-      localStorage.setItem("userRole", data.data.role);
+      // Debug: Check what's being stored
+      console.log("Token being stored:", data.token);
+      console.log("Role being stored:", data.data.role);
 
-      if (data.data.role === "admin") {
-        navigate("/admin/dashboard");
+      // Store token and user data correctly
+      if (data.success && data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userRole", data.data.role);
+        localStorage.setItem("userId", data.data._id);
+
+        // Verify token is stored correctly
+        console.log("Token after storage:", localStorage.getItem("token"));
+
+        if (data.data.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
-        navigate("/dashboard");
+        setError("Login response missing token or success flag");
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError(err.response?.data?.message || err.message || "Login failed");
     } finally {
       setLoading(false);
