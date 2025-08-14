@@ -8,57 +8,38 @@ import AdminRoute from "../components/AdminRoute";
 import NotFound from "../pages/NotFound";
 import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
+import ProductCatalog from "../pages/customer/ProductCatalog";
+import MainLayout from "../layouts/MainLayout";
+import PlainLayout from "../layouts/PlainLayout";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/dashboard" element={<Login />} />
+      {/* Public routes with navbar */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<ProductCatalog />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
 
-      {/* Protected Admin Routes */}
+      {/* Auth routes (no navbar) */}
+      <Route element={<PlainLayout />}>
+        <Route path="/login" element={<Login />} />
+      </Route>
+
+      {/* Admin routes (no navbar) */}
       <Route
-        path="/admin/dashboard"
         element={
           <AdminRoute>
-            <AdminDashboard />
+            <PlainLayout />
           </AdminRoute>
         }
-      />
-      <Route
-        path="/admin/orders"
-        element={
-          <AdminRoute>
-            <AdminOrders />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/orders/:id"
-        element={
-          <AdminRoute>
-            <AdminOrderDetails />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/products"
-        element={
-          <AdminRoute>
-            <ProductsDashboard />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <AdminRoute>
-            <UsersDashboard />
-          </AdminRoute>
-        }
-      />
-      {/* Fallback route for non-existing pages */}
-      <Route path="*" element={<NotFound />} />
+      >
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
+        <Route path="/admin/products" element={<ProductsDashboard />} />
+        <Route path="/admin/users" element={<UsersDashboard />} />
+      </Route>
     </Routes>
   );
 };

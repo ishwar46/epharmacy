@@ -42,6 +42,23 @@ export const getProducts = async (filters = {}) => {
     }
 };
 
+
+// getCategories
+export const getCategories = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/products/categories`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        throw error;
+    }
+};
+
 // Get single product
 export const getProduct = async (id) => {
     try {
