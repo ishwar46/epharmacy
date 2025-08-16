@@ -1,10 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
+import UserProfile from "../pages/UserProfile";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminOrders from "../pages/AdminOrders";
 import AdminOrderDetails from "../components/AdminOrderDetails";
 import AdminRoute from "../components/AdminRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
 import NotFound from "../pages/NotFound";
 import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
@@ -29,6 +32,16 @@ const AppRoutes = () => {
       {/* Auth routes (no navbar) */}
       <Route element={<PlainLayout />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
+
+      {/* Protected user routes (with navbar) */}
+      <Route element={<MainLayout />}>
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } />
       </Route>
 
       {/* Admin routes (no navbar) */}

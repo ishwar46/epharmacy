@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { Toaster } from "react-hot-toast";
 import { SearchProvider } from "./contexts/SearchContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from "react-helmet-async";
 
 const App = () => {
@@ -15,12 +16,14 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <SearchProvider>
-        <Toaster position="top-right" reverseOrder={false} />
-        <div className="App">
-          <AppRoutes />
-        </div>
-      </SearchProvider>
+      <AuthProvider>
+        <SearchProvider>
+          <Toaster position="top-right" reverseOrder={false} />
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </SearchProvider>
+      </AuthProvider>
     </HelmetProvider>
   );
 };

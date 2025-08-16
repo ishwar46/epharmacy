@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import {
   FaEnvelope,
   FaLock,
@@ -11,7 +12,8 @@ import {
   FaExclamationCircle,
   FaCheckCircle,
 } from "react-icons/fa";
-import { login } from "../services/authService";
+import { login as loginService } from "../services/authService";
+import { useAuth } from "../contexts/AuthContext";
 import { generateDynamicTitle, useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const Login = () => {
@@ -22,6 +24,7 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Generate dynamic title based on login state
   const dynamicTitle = generateDynamicTitle({
@@ -38,27 +41,23 @@ const Login = () => {
     setError(null);
 
     try {
-      const data = await login(email, password);
+      const data = await loginService(email, password);
       console.log("Login successful:", data);
 
-      // Debug: Check what's being stored
-      console.log("Token being stored:", data.token);
-      console.log("Role being stored:", data.data.role);
-
-      // Store token and user data correctly
       if (data.success && data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userRole", data.data.role);
-        localStorage.setItem("userId", data.data._id);
-
-        // Verify token is stored correctly
-        console.log("Token after storage:", localStorage.getItem("token"));
-
-        if (data.data.role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
+        // Use AuthContext login method
+        login(data.data, data.token);
+        
+        toast.success(`Welcome back, ${data.data.name}!`);
+        
+        // Small delay to show the toast before navigation
+        setTimeout(() => {
+          if (data.data.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
+        }, 1000);
       } else {
         setError("Login response missing token or success flag");
       }
@@ -264,12 +263,12 @@ const Login = () => {
             {/* Sign Up Link */}
             <p className="text-gray-600">
               Don't have an account?{" "}
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="text-blue-600 hover:text-blue-700 transition-colors font-semibold"
               >
                 Create one here
-              </a>
+              </Link>
             </p>
           </div>
         </motion.div>

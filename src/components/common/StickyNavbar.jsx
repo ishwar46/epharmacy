@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { scrollToTop } from "../../utils/scrollUtils";
 import { useScrollPosition } from "../../hooks/useScrollPosition";
 import { useSearch } from "../../contexts/SearchContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { generateDynamicTitle } from "../../hooks/useDynamicTitle";
+import { getProfilePictureURL } from "../../utils/imageUtils";
 import {
   Search,
   ShoppingCart,
@@ -28,14 +30,13 @@ const StickyNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { searchQuery, updateSearch } = useSearch();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const [cartCount] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
 
   // Smart scroll behavior with throttling to prevent flickering
   const scrollPosition = useScrollPosition(50); // 50ms throttle for smooth performance
@@ -95,9 +96,9 @@ const StickyNavbar = () => {
     // Update title to show search in progress
     if (value.trim()) {
       const searchTitle = generateDynamicTitle({
-        page: 'catalog',
+        page: "catalog",
         search: value,
-        isLoading: true
+        isLoading: true,
       });
       document.title = searchTitle;
     }
@@ -109,11 +110,10 @@ const StickyNavbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
+  const handleLogout = async () => {
+    await logout();
     setIsUserMenuOpen(false);
-    console.log("Logged out");
+    navigate('/');
   };
 
   // Close menus when clicking outside
@@ -286,13 +286,25 @@ const StickyNavbar = () => {
                       aria-label="User menu"
                     >
                       <div
-                        className={`bg-blue-100 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        className={`bg-blue-100 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ${
                           isCompact ? "w-6 h-6" : "w-7 h-7 sm:w-8 sm:h-8"
                         }`}
                       >
+                        {user?.profilePicture ? (
+                          <img
+                            src={getProfilePictureURL(user.profilePicture)}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Hide image and show fallback icon
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'block';
+                            }}
+                          />
+                        ) : null}
                         <User
                           size={isCompact ? 12 : 16}
-                          className="text-blue-600"
+                          className={`text-blue-600 ${user?.profilePicture ? 'hidden' : 'block'}`}
                         />
                       </div>
                       <span
@@ -318,13 +330,14 @@ const StickyNavbar = () => {
                           </p>
                         </div>
                         <div className="py-1 sm:py-2">
-                          <a
-                            href="/profile"
+                          <Link
+                            to="/profile"
                             className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                            onClick={() => setIsUserMenuOpen(false)}
                           >
                             <Settings size={16} className="mr-3" />
                             My Profile
-                          </a>
+                          </Link>
                           <a
                             href="/orders"
                             className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
