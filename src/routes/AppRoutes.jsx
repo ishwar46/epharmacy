@@ -9,15 +9,20 @@ import NotFound from "../pages/NotFound";
 import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
 import ProductCatalog from "../pages/customer/ProductCatalog";
+import ProductDetail from "../pages/customer/ProductDetail";
 import MainLayout from "../layouts/MainLayout";
 import PlainLayout from "../layouts/PlainLayout";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 const AppRoutes = () => {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* Public routes with navbar */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<ProductCatalog />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -41,6 +46,7 @@ const AppRoutes = () => {
         <Route path="/admin/users" element={<UsersDashboard />} />
       </Route>
     </Routes>
+    </>
   );
 };
 
