@@ -12,6 +12,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { login } from "../services/authService";
+import { generateDynamicTitle, useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,15 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Generate dynamic title based on login state
+  const dynamicTitle = generateDynamicTitle({
+    page: 'login',
+    isLoading: loading
+  });
+
+  // Update document title in real-time
+  useDynamicTitle(dynamicTitle);
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -17,8 +17,12 @@ import noDataAnimation from "../assets/animations/nodata.json";
 import { formatDate } from "../utils/dateUtils";
 import { getStatusColor } from "../utils/statusUtils";
 import Loading from "../components/Loading";
+import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const AdminOrders = ({ onOrderSelect }) => {
+  // Set dynamic title for orders dashboard
+  useDynamicTitle("Orders Management | Admin Dashboard | FixPharmacy");
+
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);

@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../contexts/SearchContext";
 import SEO from "../../components/common/SEO";
 import {
+  generateDynamicTitle,
+  useDynamicTitle,
+} from "../../hooks/useDynamicTitle";
+import {
   Search,
   Filter,
   ShoppingCart,
@@ -108,9 +112,11 @@ const ProductCatalog = () => {
       import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
     return (
-      <article className="group bg-white rounded-md sm:rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-gray-100 hover:border-green-200 relative overflow-hidden" 
-               itemScope 
-               itemType="https://schema.org/Product">
+      <article
+        className="group bg-white rounded-md sm:rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-gray-100 hover:border-green-200 relative overflow-hidden"
+        itemScope
+        itemType="https://schema.org/Product"
+      >
         {/* Favorite Button */}
         <button
           onClick={() => setIsFavorite(!isFavorite)}
@@ -192,28 +198,48 @@ const ProductCatalog = () => {
             >
               {product.name}
             </h3>
-            <div className="flex items-center space-x-2" itemProp="brand" itemScope itemType="https://schema.org/Brand">
+            <div
+              className="flex items-center space-x-2"
+              itemProp="brand"
+              itemScope
+              itemType="https://schema.org/Brand"
+            >
               <Award
                 size={12}
                 className="sm:w-[14px] sm:h-[14px] text-blue-500"
                 aria-hidden="true"
               />
-              <p className="text-sm text-blue-600 font-semibold" itemProp="name">
+              <p
+                className="text-sm text-blue-600 font-semibold"
+                itemProp="name"
+              >
                 {product.brand}
               </p>
             </div>
             {product.description && (
-              <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed" itemProp="description">
+              <p
+                className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed"
+                itemProp="description"
+              >
                 {product.description}
               </p>
             )}
           </div>
 
           {/* Pricing */}
-          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+          <div
+            className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2"
+            itemProp="offers"
+            itemScope
+            itemType="https://schema.org/Offer"
+          >
             <div className="flex items-baseline justify-between">
               <div className="flex items-baseline space-x-1">
-                <span className="text-xl sm:text-2xl font-bold text-gray-900" itemProp="price" content={product.price}>
+                <span
+                  className="text-xl sm:text-2xl font-bold text-gray-900"
+                  itemProp="price"
+                  content={product.price}
+                >
                   Rs. {product.price}
                 </span>
                 <span className="text-xs sm:text-sm text-gray-600 font-medium">
@@ -224,7 +250,14 @@ const ProductCatalog = () => {
                     : "unit"}
                 </span>
                 <meta itemProp="priceCurrency" content="NPR" />
-                <meta itemProp="availability" content={product.availableStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
+                <meta
+                  itemProp="availability"
+                  content={
+                    product.availableStock > 0
+                      ? "https://schema.org/InStock"
+                      : "https://schema.org/OutOfStock"
+                  }
+                />
               </div>
               {product.medicineType === "Prescription" && (
                 <span className="text-xs text-red-600 flex items-center font-medium">
@@ -334,27 +367,40 @@ const ProductCatalog = () => {
     );
   }
 
+  // Generate dynamic title based on current state
+  const dynamicTitle = generateDynamicTitle({
+    page: "catalog",
+    search: filters.search,
+    category: filters.category,
+    medicineType: filters.medicineType,
+    isLoading: loading,
+    resultCount: totalProducts,
+    hasResults: products.length > 0,
+  });
+
+  // Update document title in real-time
+  useDynamicTitle(dynamicTitle);
+
   // Generate dynamic SEO data based on filters
   const generateSEOData = () => {
-    let title = "FixPharmacy - Buy Medicines Online in Biratnagar, Nepal";
-    let description = "Shop authentic medicines online at FixPharmacy. Fast delivery, licensed pharmacy, prescription and OTC medicines available in Biratnagar, Nepal.";
-    let keywords = "buy medicines online Nepal, online pharmacy Biratnagar, prescription medicines delivery, OTC medicines Nepal, authentic medicines, fast pharmacy delivery";
+    let title = dynamicTitle;
+    let description =
+      "Shop authentic medicines online at FixPharmacy. Fast delivery, licensed pharmacy, prescription and OTC medicines available in Biratnagar, Nepal.";
+    let keywords =
+      "buy medicines online Nepal, online pharmacy Biratnagar, prescription medicines delivery, OTC medicines Nepal, authentic medicines, fast pharmacy delivery";
 
     if (hasActiveFilters) {
       if (filters.search) {
-        title = `${filters.search} - Search Results | FixPharmacy`;
         description = `Find ${filters.search} and other medicines at FixPharmacy. Authentic products with fast delivery in Biratnagar, Nepal.`;
         keywords = `${filters.search}, ${filters.search} online, buy ${filters.search} Nepal, ${keywords}`;
       }
-      
+
       if (filters.category) {
-        title = `${filters.category} Medicines | FixPharmacy`;
         description = `Browse ${filters.category} medicines at FixPharmacy. Licensed pharmacy with authentic ${filters.category} products and fast delivery.`;
         keywords = `${filters.category} medicines Nepal, ${filters.category} online pharmacy, ${keywords}`;
       }
 
       if (filters.medicineType) {
-        title = `${filters.medicineType} Medicines | FixPharmacy`;
         description = `Buy ${filters.medicineType} medicines online at FixPharmacy. Licensed pharmacy with fast delivery in Biratnagar, Nepal.`;
         keywords = `${filters.medicineType} medicines Nepal, ${filters.medicineType} online, ${keywords}`;
       }
@@ -364,44 +410,44 @@ const ProductCatalog = () => {
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": title,
-      "description": description,
-      "url": "https://fixpharmacy.com/",
-      "mainEntity": {
+      name: title,
+      description: description,
+      url: "https://fixpharmacy.com/",
+      mainEntity: {
         "@type": "ItemList",
-        "numberOfItems": totalProducts,
-        "itemListElement": products.slice(0, 10).map((product, index) => ({
+        numberOfItems: totalProducts,
+        itemListElement: products.slice(0, 10).map((product, index) => ({
           "@type": "Product",
-          "position": index + 1,
-          "name": product.name,
-          "description": product.description,
-          "brand": {
+          position: index + 1,
+          name: product.name,
+          description: product.description,
+          brand: {
             "@type": "Brand",
-            "name": product.brand
+            name: product.brand,
           },
-          "category": product.category,
-          "offers": {
+          category: product.category,
+          offers: {
             "@type": "Offer",
-            "price": product.price,
-            "priceCurrency": "NPR",
-            "availability": product.availableStock > 0 ? "InStock" : "OutOfStock",
-            "seller": {
+            price: product.price,
+            priceCurrency: "NPR",
+            availability: product.availableStock > 0 ? "InStock" : "OutOfStock",
+            seller: {
               "@type": "Organization",
-              "name": "FixPharmacy"
-            }
-          }
-        }))
+              name: "FixPharmacy",
+            },
+          },
+        })),
       },
-      "provider": {
+      provider: {
         "@type": "Pharmacy",
-        "name": "FixPharmacy",
-        "address": {
+        name: "FixPharmacy",
+        address: {
           "@type": "PostalAddress",
-          "streetAddress": "Bargachhi Chowk",
-          "addressLocality": "Biratnagar",
-          "addressCountry": "NP"
-        }
-      }
+          streetAddress: "Bargachhi Chowk",
+          addressLocality: "Biratnagar",
+          addressCountry: "NP",
+        },
+      },
     };
 
     return { title, description, keywords, structuredData };
@@ -419,216 +465,225 @@ const ProductCatalog = () => {
         structuredData={seoData.structuredData}
       />
       <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
-        {/* Filters */}
-        <section className="bg-white rounded-md sm:rounded-md shadow-sm border border-gray-100 mb-6 sm:mb-8 overflow-hidden" 
-                 aria-label="Product filters"
-                 role="search">
-          {/* Filter Toggle - Always visible but styled for mobile-first */}
-          <button
-            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            className="w-full flex items-center justify-between p-4 sm:p-6 bg-white hover:bg-gray-50 transition-colors lg:cursor-default border-b border-gray-100"
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+          {/* Filters */}
+          <section
+            className="bg-white rounded-md sm:rounded-md shadow-sm border border-gray-100 mb-6 sm:mb-8 overflow-hidden"
+            aria-label="Product filters"
+            role="search"
           >
-            <div className="flex items-center space-x-3">
-              <Filter size={18} className="sm:w-5 sm:h-5 text-blue-600" />
-              <span className="font-semibold text-sm sm:text-base text-gray-900">
-                Filter Products
-              </span>
-            </div>
-            <div className="lg:hidden">
-              {isFiltersOpen ? (
-                <ChevronUp size={18} className="sm:w-5 sm:h-5 text-blue-600" />
-              ) : (
-                <ChevronDown
-                  size={18}
-                  className="sm:w-5 sm:h-5 text-blue-600"
-                />
-              )}
-            </div>
-          </button>
-
-          {/* Filter Content */}
-          <div
-            className={`${
-              isFiltersOpen ? "block" : "hidden"
-            } lg:block p-4 sm:p-6 border-t border-gray-100 lg:border-t-0`}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {/* Search */}
-              <div className="relative sm:col-span-2 lg:col-span-1">
-                <Search
-                  size={16}
-                  className="sm:w-5 sm:h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
-                  placeholder="Search medicines..."
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange("search", e.target.value)}
-                  className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-                />
-              </div>
-
-              {/* Category Filter */}
-              <select
-                value={filters.category}
-                onChange={(e) => handleFilterChange("category", e.target.value)}
-                className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-
-              {/* Medicine Type Filter */}
-              <select
-                value={filters.medicineType}
-                onChange={(e) =>
-                  handleFilterChange("medicineType", e.target.value)
-                }
-                className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-              >
-                <option value="">All Types</option>
-                {medicineTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-
-              {/* Clear Filters */}
-              <button
-                onClick={() => {
-                  clearFilters();
-                  setIsFiltersOpen(false);
-                }}
-                className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all font-semibold text-sm sm:text-base"
-              >
-                Clear Filters
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Results Header - Only show count when filters are active */}
-        {hasActiveFilters && (
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
-              <span className="text-blue-600">{totalProducts}</span> Products
-              Found
-              {filters.search && (
-                <span className="block text-sm sm:text-base font-normal text-gray-600 mt-1">
-                  for "{filters.search}"
+            {/* Filter Toggle - Always visible but styled for mobile-first */}
+            <button
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className="w-full flex items-center justify-between p-4 sm:p-6 bg-white hover:bg-gray-50 transition-colors lg:cursor-default border-b border-gray-100"
+            >
+              <div className="flex items-center space-x-3">
+                <Filter size={18} className="sm:w-5 sm:h-5 text-blue-600" />
+                <span className="font-semibold text-sm sm:text-base text-gray-900">
+                  Filter Products
                 </span>
-              )}
-            </h2>
-            <div className="text-xs sm:text-sm text-gray-600 bg-white px-2 sm:px-3 py-1 sm:py-2 rounded-full border">
-              Page {filters.page} of {totalPages}
-            </div>
-          </div>
-        )}
+              </div>
+              <div className="lg:hidden">
+                {isFiltersOpen ? (
+                  <ChevronUp
+                    size={18}
+                    className="sm:w-5 sm:h-5 text-blue-600"
+                  />
+                ) : (
+                  <ChevronDown
+                    size={18}
+                    className="sm:w-5 sm:h-5 text-blue-600"
+                  />
+                )}
+              </div>
+            </button>
 
-        {/* Show simple header when no filters are active */}
-        {!hasActiveFilters && (
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-              Our Products
-            </h2>
-            {totalPages > 1 && (
+            {/* Filter Content */}
+            <div
+              className={`${
+                isFiltersOpen ? "block" : "hidden"
+              } lg:block p-4 sm:p-6 border-t border-gray-100 lg:border-t-0`}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* Search */}
+                <div className="relative sm:col-span-2 lg:col-span-1">
+                  <Search
+                    size={16}
+                    className="sm:w-5 sm:h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search medicines..."
+                    value={filters.search}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
+                    className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
+                  />
+                </div>
+
+                {/* Category Filter */}
+                <select
+                  value={filters.category}
+                  onChange={(e) =>
+                    handleFilterChange("category", e.target.value)
+                  }
+                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Medicine Type Filter */}
+                <select
+                  value={filters.medicineType}
+                  onChange={(e) =>
+                    handleFilterChange("medicineType", e.target.value)
+                  }
+                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
+                >
+                  <option value="">All Types</option>
+                  {medicineTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Clear Filters */}
+                <button
+                  onClick={() => {
+                    clearFilters();
+                    setIsFiltersOpen(false);
+                  }}
+                  className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all font-semibold text-sm sm:text-base"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Results Header - Only show count when filters are active */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
+                <span className="text-blue-600">{totalProducts}</span> Products
+                Found
+                {filters.search && (
+                  <span className="block text-sm sm:text-base font-normal text-gray-600 mt-1">
+                    for "{filters.search}"
+                  </span>
+                )}
+              </h2>
               <div className="text-xs sm:text-sm text-gray-600 bg-white px-2 sm:px-3 py-1 sm:py-2 rounded-full border">
                 Page {filters.page} of {totalPages}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Loading State */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {[...Array(8)].map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 animate-pulse"
-              >
-                <div className="h-36 sm:h-48 bg-gray-200 rounded-lg sm:rounded-xl mb-4 sm:mb-5"></div>
-                <div className="space-y-3">
-                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
-                  <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
+          {/* Show simple header when no filters are active */}
+          {!hasActiveFilters && (
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                Our Products
+              </h2>
+              {totalPages > 1 && (
+                <div className="text-xs sm:text-sm text-gray-600 bg-white px-2 sm:px-3 py-1 sm:py-2 rounded-full border">
+                  Page {filters.page} of {totalPages}
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <>
-            {/* Products Grid */}
-            {products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                {products.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 sm:py-16 bg-white rounded-md sm:rounded-md shadow-md">
-                <Package
-                  size={60}
-                  className="sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4"
-                />
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                  No Products Found
-                </h3>
-                <p className="text-sm sm:text-lg text-gray-600">
-                  Try adjusting your search criteria
-                </p>
-              </div>
-            )}
+              )}
+            </div>
+          )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2 px-4">
-                <button
-                  onClick={() => handlePageChange(filters.page - 1)}
-                  disabled={filters.page === 1}
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
+          {/* Loading State */}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {[...Array(8)].map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 animate-pulse"
                 >
-                  Previous
-                </button>
+                  <div className="h-36 sm:h-48 bg-gray-200 rounded-lg sm:rounded-xl mb-4 sm:mb-5"></div>
+                  <div className="space-y-3">
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
+                    <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Products Grid */}
+              {products.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  {products.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 sm:py-16 bg-white rounded-md sm:rounded-md shadow-md">
+                  <Package
+                    size={60}
+                    className="sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4"
+                  />
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                    No Products Found
+                  </h3>
+                  <p className="text-sm sm:text-lg text-gray-600">
+                    Try adjusting your search criteria
+                  </p>
+                </div>
+              )}
 
-                {[...Array(totalPages)].map((_, index) => {
-                  const page = index + 1;
-                  const isCurrentPage = page === filters.page;
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center space-x-2 px-4">
+                  <button
+                    onClick={() => handlePageChange(filters.page - 1)}
+                    disabled={filters.page === 1}
+                    className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
+                  >
+                    Previous
+                  </button>
 
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all ${
-                        isCurrentPage
-                          ? "bg-blue-600 text-white shadow-md"
-                          : "text-gray-600 bg-white border-2 border-gray-200 hover:border-blue-200 hover:text-blue-600"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
+                  {[...Array(totalPages)].map((_, index) => {
+                    const page = index + 1;
+                    const isCurrentPage = page === filters.page;
 
-                <button
-                  onClick={() => handlePageChange(filters.page + 1)}
-                  disabled={filters.page === totalPages}
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all ${
+                          isCurrentPage
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "text-gray-600 bg-white border-2 border-gray-200 hover:border-blue-200 hover:text-blue-600"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => handlePageChange(filters.page + 1)}
+                    disabled={filters.page === totalPages}
+                    className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </main>
     </>
   );

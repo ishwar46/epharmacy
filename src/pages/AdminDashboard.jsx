@@ -8,6 +8,7 @@ import { getMe } from "../services/authService";
 import ProductsDashboard from "./ProductsDashboard";
 import UsersDashboard from "./UsersDashboard";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { generateDynamicTitle, useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const AdminDashboard = () => {
   const [selectedPage, setSelectedPage] = useState("dashboard");
@@ -17,6 +18,19 @@ const AdminDashboard = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const navigate = useNavigate();
+
+  // Generate dynamic title based on selected page
+  const dynamicTitle = generateDynamicTitle({
+    page: selectedPage === "dashboard" ? "admin" : selectedPage === "orderDetails" ? "admin" : "admin",
+    productName: selectedPage === "orderDetails" ? `Order #${selectedOrderId}` : "",
+    brand: selectedPage === "products" ? "Products Management" : 
+           selectedPage === "users" ? "Users Management" : 
+           selectedPage === "orders" ? "Orders Management" : 
+           selectedPage === "orderDetails" ? "Order Details" : ""
+  });
+
+  // Update document title in real-time
+  useDynamicTitle(dynamicTitle);
 
   useEffect(() => {
     const fetchAdmin = async () => {

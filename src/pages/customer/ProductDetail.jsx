@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SEO from "../../components/common/SEO";
+import { generateDynamicTitle, useDynamicTitle } from "../../hooks/useDynamicTitle";
 import {
   ArrowLeft,
   ShoppingCart,
@@ -32,6 +33,17 @@ const ProductDetail = () => {
   const [purchaseType, setPurchaseType] = useState("package");
   
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+  // Generate dynamic title based on product state (hooks must be at top level)
+  const dynamicTitle = generateDynamicTitle({
+    page: 'product',
+    productName: product?.name,
+    brand: product?.brand,
+    isLoading: loading
+  });
+
+  // Update document title in real-time
+  useDynamicTitle(dynamicTitle);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -126,7 +138,7 @@ const ProductDetail = () => {
   const generateProductSEO = () => {
     if (!product) return {};
 
-    const title = `${product.name} by ${product.brand} | Buy Online at FixPharmacy`;
+    const title = dynamicTitle;
     const description = `Buy ${product.name} by ${product.brand} online at FixPharmacy. ${product.description || 'Authentic medicine'} with fast delivery in Biratnagar, Nepal. ${product.medicineType} medicine available.`;
     const keywords = `${product.name}, ${product.brand}, buy ${product.name} online, ${product.category} medicines, ${product.medicineType} medicine Nepal, online pharmacy Biratnagar`;
     

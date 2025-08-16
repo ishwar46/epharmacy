@@ -2,8 +2,12 @@ import React from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import NotFoundImage from "../assets/images/404.png";
+import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
 function NotFound() {
+  // Set dynamic title for 404 page
+  useDynamicTitle("Page Not Found | 404 Error | FixPharmacy");
+
   return (
     <Container
       maxWidth="md"

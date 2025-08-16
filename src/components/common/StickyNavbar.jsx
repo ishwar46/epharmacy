@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { scrollToTop } from "../../utils/scrollUtils";
 import { useScrollPosition } from "../../hooks/useScrollPosition";
 import { useSearch } from "../../contexts/SearchContext";
+import { generateDynamicTitle } from "../../hooks/useDynamicTitle";
 import {
   Search,
   ShoppingCart,
@@ -90,6 +91,16 @@ const StickyNavbar = () => {
 
     // Update global search state immediately for instant results
     updateSearch(value);
+
+    // Update title to show search in progress
+    if (value.trim()) {
+      const searchTitle = generateDynamicTitle({
+        page: 'catalog',
+        search: value,
+        isLoading: true
+      });
+      document.title = searchTitle;
+    }
 
     // Only navigate to ProductCatalog (home page) if not already there AND there's a search query
     // This prevents unnecessary navigation when already on the ProductCatalog page

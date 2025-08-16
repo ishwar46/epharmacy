@@ -24,8 +24,12 @@ import categories from "../constants/categories";
 import Lottie from "react-lottie";
 import noDataAnimation from "../assets/animations/nodata.json";
 import Loading from "../components/Loading";
+import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const PharmacyDashboard = () => {
+  // Set dynamic title for pharmacy dashboard
+  useDynamicTitle("Admin Dashboard | Management | FixPharmacy");
+
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);

@@ -22,6 +22,7 @@ import { getOrder } from "../services/orderService";
 import UpdateOrderModal from "../components/UpdateOrderModal.jsx";
 import { formatDate } from "../utils/dateUtils";
 import { getStatusColor } from "../utils/statusUtils";
+import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -64,6 +65,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
   const [loading, setLoading] = useState(true);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [error, setError] = useState(null);
+
+  // Set dynamic title for order details
+  useDynamicTitle(`Order #${orderId} | Order Details | Admin Dashboard | FixPharmacy`);
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);
