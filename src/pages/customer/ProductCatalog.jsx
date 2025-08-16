@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSearch } from "../../contexts/SearchContext";
 import {
   Search,
   Filter,
@@ -12,25 +14,25 @@ import {
   Heart,
   Award,
   Clock,
+  Eye,
 } from "lucide-react";
 import { getProducts, getCategories } from "../../services/productService";
 
 const ProductCatalog = () => {
+  const navigate = useNavigate();
+  const { searchFilters, updateFilter, clearFilters } = useSearch();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "",
-    medicineType: "",
-    page: 1,
-    limit: 12,
-  });
   const [categories, setCategories] = useState([]);
   const [medicineTypes, setMedicineTypes] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
+
+  // Use filters from context
+  const filters = searchFilters;
 
   // Check if any filters are active
   const hasActiveFilters =
@@ -81,18 +83,11 @@ const ProductCatalog = () => {
   }, [filters]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-      page: 1, // Reset to first page when filtering
-    }));
+    updateFilter(key, value);
   };
 
   const handlePageChange = (newPage) => {
-    setFilters((prev) => ({
-      ...prev,
-      page: newPage,
-    }));
+    updateFilter("page", newPage);
     // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -127,7 +122,7 @@ const ProductCatalog = () => {
         </button>
 
         {/* Product Image */}
-        <div className="relative h-36 sm:h-48 bg-gray-50 rounded-sm sm:rounded-sm mb-4 sm:mb-5 flex items-center justify-center overflow-hidden">
+        <div className="relative h-36 sm:h-48 bg-gray-50 rounded-sm sm:rounded-sm mb-4 sm:mb-5 flex items-center justify-center overflow-hidden group/image">
           {product.images && product.images.length > 0 ? (
             <img
               src={`${API_BASE_URL}${product.images[0]}`}
@@ -145,6 +140,17 @@ const ProductCatalog = () => {
               className="sm:w-14 sm:h-14 mb-2 sm:mb-3 text-gray-400"
             />
             <p className="text-xs sm:text-sm font-medium">No Image Available</p>
+          </div>
+
+          {/* View Details Overlay */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button
+              onClick={() => navigate(`/product/${product._id}`)}
+              className="bg-white text-gray-900 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 hover:bg-gray-100 transition-colors"
+            >
+              <Eye size={16} />
+              <span>View Details</span>
+            </button>
           </div>
         </div>
 
@@ -173,7 +179,10 @@ const ProductCatalog = () => {
 
           {/* Product Name & Brand */}
           <div className="space-y-2">
-            <h3 className="font-bold text-base sm:text-lg text-gray-900 line-clamp-2 leading-tight">
+            <h3
+              className="font-bold text-base sm:text-lg text-gray-900 line-clamp-2 leading-tight cursor-pointer hover:text-blue-600 transition-colors"
+              onClick={() => navigate(`/product/${product._id}`)}
+            >
               {product.name}
             </h3>
             <div className="flex items-center space-x-2">
@@ -398,13 +407,7 @@ const ProductCatalog = () => {
               {/* Clear Filters */}
               <button
                 onClick={() => {
-                  setFilters({
-                    search: "",
-                    category: "",
-                    medicineType: "",
-                    page: 1,
-                    limit: 12,
-                  });
+                  clearFilters();
                   setIsFiltersOpen(false);
                 }}
                 className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all font-semibold text-sm sm:text-base"
