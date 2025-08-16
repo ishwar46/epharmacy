@@ -3,23 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="A modern web application built with Vite and React."
-    />
-    <meta name="keywords" content="React, Vite, Web Development, JavaScript" />
-    <meta name="author" content="Your Name or Company Name" />
+    
+    <!-- Primary Meta Tags -->
+    <title>FixPharmacy - Your Trusted Online Pharmacy in Biratnagar, Nepal</title>
+    <meta name="title" content="FixPharmacy - Your Trusted Online Pharmacy in Biratnagar, Nepal" />
+    <meta name="description" content="FixPharmacy is your trusted online pharmacy in Biratnagar, Nepal. Order medicines online with fast delivery, authentic products, and 24/7 support. Licensed pharmacy with prescription and over-the-counter medicines." />
+    <meta name="keywords" content="online pharmacy Nepal, medicine delivery Biratnagar, prescription medicines Nepal, authentic medicines, fast delivery pharmacy, 24/7 pharmacy support, licensed pharmacy Nepal, healthcare products Nepal" />
+    <meta name="author" content="FixPharmacy" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="geo.region" content="NP-P1" />
+    <meta name="geo.placename" content="Biratnagar, Nepal" />
+    <meta name="geo.position" content="26.4525;87.2718" />
+    <meta name="ICBM" content="26.4525, 87.2718" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fixpharmacy.com/" />
+    <meta property="og:title" content="FixPharmacy - Your Trusted Online Pharmacy in Biratnagar, Nepal" />
+    <meta property="og:description" content="Order medicines online with fast delivery, authentic products, and 24/7 support. Licensed pharmacy in Biratnagar, Nepal." />
+    <meta property="og:image" content="https://fixpharmacy.com/og-image.jpg" />
+    <meta property="og:site_name" content="FixPharmacy" />
+    <meta property="og:locale" content="en_US" />
 
-    <!-- Preload main script for better performance -->
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://fixpharmacy.com/" />
+    <meta property="twitter:title" content="FixPharmacy - Your Trusted Online Pharmacy in Biratnagar, Nepal" />
+    <meta property="twitter:description" content="Order medicines online with fast delivery, authentic products, and 24/7 support. Licensed pharmacy in Biratnagar, Nepal." />
+    <meta property="twitter:image" content="https://fixpharmacy.com/twitter-image.jpg" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#4A90E2" />
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://maps.googleapis.com" />
+    
+    <!-- Preload critical resources -->
     <link rel="preload" as="script" href="/src/main.jsx" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://fixpharmacy.com/" />
 
-    <title>FixPharmacy</title>
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Pharmacy",
+      "name": "FixPharmacy",
+      "description": "Your trusted online pharmacy in Biratnagar, Nepal providing authentic medicines with fast delivery and 24/7 support.",
+      "url": "https://fixpharmacy.com",
+      "logo": "https://fixpharmacy.com/logo.png",
+      "image": "https://fixpharmacy.com/og-image.jpg",
+      "telephone": "+977-1-4445566",
+      "email": "info@fixpharmacy.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Bargachhi Chowk",
+        "addressLocality": "Biratnagar",
+        "addressCountry": "NP",
+        "postalCode": "56613"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 26.4525,
+        "longitude": 87.2718
+      },
+      "openingHours": "Mo-Su 00:00-23:59",
+      "currenciesAccepted": "NPR",
+      "paymentAccepted": "Cash, Credit Card, Online Payment",
+      "priceRange": "$$",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Nepal"
+      },
+      "serviceType": "Online Pharmacy",
+      "availableService": [
+        {
+          "@type": "Service",
+          "name": "Prescription Medicine Delivery",
+          "description": "Fast delivery of prescription medicines with valid prescription"
+        },
+        {
+          "@type": "Service", 
+          "name": "Over-the-Counter Medicine Delivery",
+          "description": "Quick delivery of OTC medicines and health products"
+        },
+        {
+          "@type": "Service",
+          "name": "24/7 Pharmacy Support",
+          "description": "Round the clock customer support for all pharmacy needs"
+        }
+      ]
+    }
+    </script>
   </head>
-  <body class="bg-gray-100">
+  <body>
     <div id="root"></div>
     <div id="modal-root"></div>
     <script type="module" src="/src/main.jsx"></script>

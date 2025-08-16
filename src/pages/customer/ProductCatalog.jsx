@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../contexts/SearchContext";
+import SEO from "../../components/common/SEO";
 import {
   Search,
   Filter,
@@ -107,7 +108,9 @@ const ProductCatalog = () => {
       import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
     return (
-      <div className="group bg-white rounded-md sm:rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-gray-100 hover:border-green-200 relative overflow-hidden">
+      <article className="group bg-white rounded-md sm:rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-gray-100 hover:border-green-200 relative overflow-hidden" 
+               itemScope 
+               itemType="https://schema.org/Product">
         {/* Favorite Button */}
         <button
           onClick={() => setIsFavorite(!isFavorite)}
@@ -126,8 +129,11 @@ const ProductCatalog = () => {
           {product.images && product.images.length > 0 ? (
             <img
               src={`${API_BASE_URL}${product.images[0]}`}
-              alt={product.name}
+              alt={`${product.name} by ${product.brand} - ${product.category} medicine available at FixPharmacy`}
+              title={`Buy ${product.name} online - Rs. ${product.price}`}
               className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+              itemProp="image"
+              loading="lazy"
               onError={(e) => {
                 e.target.style.display = "none";
                 e.target.nextSibling.style.display = "flex";
@@ -182,30 +188,32 @@ const ProductCatalog = () => {
             <h3
               className="font-bold text-base sm:text-lg text-gray-900 line-clamp-2 leading-tight cursor-pointer hover:text-blue-600 transition-colors"
               onClick={() => navigate(`/product/${product._id}`)}
+              itemProp="name"
             >
               {product.name}
             </h3>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" itemProp="brand" itemScope itemType="https://schema.org/Brand">
               <Award
                 size={12}
                 className="sm:w-[14px] sm:h-[14px] text-blue-500"
+                aria-hidden="true"
               />
-              <p className="text-sm text-blue-600 font-semibold">
+              <p className="text-sm text-blue-600 font-semibold" itemProp="name">
                 {product.brand}
               </p>
             </div>
             {product.description && (
-              <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed" itemProp="description">
                 {product.description}
               </p>
             )}
           </div>
 
           {/* Pricing */}
-          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2">
+          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2" itemProp="offers" itemScope itemType="https://schema.org/Offer">
             <div className="flex items-baseline justify-between">
               <div className="flex items-baseline space-x-1">
-                <span className="text-xl sm:text-2xl font-bold text-gray-900">
+                <span className="text-xl sm:text-2xl font-bold text-gray-900" itemProp="price" content={product.price}>
                   Rs. {product.price}
                 </span>
                 <span className="text-xs sm:text-sm text-gray-600 font-medium">
@@ -215,6 +223,8 @@ const ProductCatalog = () => {
                     ? "strip"
                     : "unit"}
                 </span>
+                <meta itemProp="priceCurrency" content="NPR" />
+                <meta itemProp="availability" content={product.availableStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"} />
               </div>
               {product.medicineType === "Prescription" && (
                 <span className="text-xs text-red-600 flex items-center font-medium">
@@ -297,7 +307,7 @@ const ProductCatalog = () => {
             )}
           </div>
         </div>
-      </div>
+      </article>
     );
   };
 
@@ -324,11 +334,96 @@ const ProductCatalog = () => {
     );
   }
 
+  // Generate dynamic SEO data based on filters
+  const generateSEOData = () => {
+    let title = "FixPharmacy - Buy Medicines Online in Biratnagar, Nepal";
+    let description = "Shop authentic medicines online at FixPharmacy. Fast delivery, licensed pharmacy, prescription and OTC medicines available in Biratnagar, Nepal.";
+    let keywords = "buy medicines online Nepal, online pharmacy Biratnagar, prescription medicines delivery, OTC medicines Nepal, authentic medicines, fast pharmacy delivery";
+
+    if (hasActiveFilters) {
+      if (filters.search) {
+        title = `${filters.search} - Search Results | FixPharmacy`;
+        description = `Find ${filters.search} and other medicines at FixPharmacy. Authentic products with fast delivery in Biratnagar, Nepal.`;
+        keywords = `${filters.search}, ${filters.search} online, buy ${filters.search} Nepal, ${keywords}`;
+      }
+      
+      if (filters.category) {
+        title = `${filters.category} Medicines | FixPharmacy`;
+        description = `Browse ${filters.category} medicines at FixPharmacy. Licensed pharmacy with authentic ${filters.category} products and fast delivery.`;
+        keywords = `${filters.category} medicines Nepal, ${filters.category} online pharmacy, ${keywords}`;
+      }
+
+      if (filters.medicineType) {
+        title = `${filters.medicineType} Medicines | FixPharmacy`;
+        description = `Buy ${filters.medicineType} medicines online at FixPharmacy. Licensed pharmacy with fast delivery in Biratnagar, Nepal.`;
+        keywords = `${filters.medicineType} medicines Nepal, ${filters.medicineType} online, ${keywords}`;
+      }
+    }
+
+    // Structured data for product listings
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": title,
+      "description": description,
+      "url": "https://fixpharmacy.com/",
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": totalProducts,
+        "itemListElement": products.slice(0, 10).map((product, index) => ({
+          "@type": "Product",
+          "position": index + 1,
+          "name": product.name,
+          "description": product.description,
+          "brand": {
+            "@type": "Brand",
+            "name": product.brand
+          },
+          "category": product.category,
+          "offers": {
+            "@type": "Offer",
+            "price": product.price,
+            "priceCurrency": "NPR",
+            "availability": product.availableStock > 0 ? "InStock" : "OutOfStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "FixPharmacy"
+            }
+          }
+        }))
+      },
+      "provider": {
+        "@type": "Pharmacy",
+        "name": "FixPharmacy",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Bargachhi Chowk",
+          "addressLocality": "Biratnagar",
+          "addressCountry": "NP"
+        }
+      }
+    };
+
+    return { title, description, keywords, structuredData };
+  };
+
+  const seoData = generateSEOData();
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <SEO
+        title={seoData.title}
+        description={seoData.description}
+        keywords={seoData.keywords}
+        canonical="https://fixpharmacy.com/"
+        structuredData={seoData.structuredData}
+      />
+      <main className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Filters */}
-        <div className="bg-white rounded-md sm:rounded-md shadow-sm border border-gray-100 mb-6 sm:mb-8 overflow-hidden">
+        <section className="bg-white rounded-md sm:rounded-md shadow-sm border border-gray-100 mb-6 sm:mb-8 overflow-hidden" 
+                 aria-label="Product filters"
+                 role="search">
           {/* Filter Toggle - Always visible but styled for mobile-first */}
           <button
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
@@ -416,7 +511,7 @@ const ProductCatalog = () => {
               </button>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Results Header - Only show count when filters are active */}
         {hasActiveFilters && (
@@ -534,7 +629,8 @@ const ProductCatalog = () => {
           </>
         )}
       </div>
-    </div>
+      </main>
+    </>
   );
 };
 

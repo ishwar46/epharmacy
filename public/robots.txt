@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://fixpharmacy.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Block admin routes
+Disallow: /admin/
+Disallow: /login
+Disallow: /api/
+
+# Allow important pages
+Allow: /
+Allow: /product/
+Allow: /about
+Allow: /contact
+Allow: /prescriptions
