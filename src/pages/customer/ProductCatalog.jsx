@@ -145,13 +145,21 @@ const ProductCatalog = () => {
                 e.target.nextSibling.style.display = "flex";
               }}
             />
-          ) : null}
-          <div className="text-gray-400 text-center flex flex-col items-center justify-center h-full w-full">
+          ) : (
+            <div className="text-gray-400 text-center flex flex-col items-center justify-center h-full w-full">
+              <Package
+                size={40}
+                className="sm:w-14 sm:h-14 mb-2 sm:mb-3 text-gray-400"
+              />
+              <p className="text-xs sm:text-sm font-medium">No Image Available</p>
+            </div>
+          )}
+          <div className="text-gray-400 text-center flex-col items-center justify-center h-full w-full" style={{display: 'none'}}>
             <Package
               size={40}
               className="sm:w-14 sm:h-14 mb-2 sm:mb-3 text-gray-400"
             />
-            <p className="text-xs sm:text-sm font-medium">No Image Available</p>
+            <p className="text-xs sm:text-sm font-medium">Image not found</p>
           </div>
 
           {/* View Details Overlay */}
@@ -247,6 +255,8 @@ const ProductCatalog = () => {
                   {product.productType === "tablet" ||
                   product.productType === "capsule"
                     ? "strip"
+                    : product.productType === "syrup"
+                    ? "bottle"
                     : "unit"}
                 </span>
                 <meta itemProp="priceCurrency" content="NPR" />
@@ -273,7 +283,9 @@ const ProductCatalog = () => {
                   {product.productType}
                 </span>
                 <span className="text-xs text-gray-500 bg-white/80 px-2 py-1 rounded-full">
-                  {product.unitsPerStrip} per strip
+                  {product.productType === "syrup" 
+                    ? "1 bottle" 
+                    : `${product.unitsPerStrip} per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
                 </span>
               </div>
             )}
@@ -318,7 +330,13 @@ const ProductCatalog = () => {
               }`}
             >
               <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
-              <span>Add Strip/Package</span>
+              <span>
+                Add {product.productType === "tablet" || product.productType === "capsule" 
+                  ? "Strip/Package" 
+                  : product.productType === "syrup" 
+                  ? "Bottle" 
+                  : "Package"}
+              </span>
               <span className="font-bold">Rs. {product.price}</span>
             </button>
 

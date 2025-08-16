@@ -245,12 +245,19 @@ const ProductDetail = () => {
                       e.target.nextSibling.style.display = "flex";
                     }}
                   />
-                ) : null}
-                {/* Fallback Content */}
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                    <div className="text-center px-4">
+                      <Package size={48} className="sm:w-16 sm:h-16 mx-auto mb-3" />
+                      <p className="text-base sm:text-lg font-medium">No Image Available</p>
+                    </div>
+                  </div>
+                )}
+                {/* Error Fallback Content */}
+                <div className="absolute inset-0 items-center justify-center text-gray-400" style={{display: 'none'}}>
                   <div className="text-center px-4">
                     <Package size={48} className="sm:w-16 sm:h-16 mx-auto mb-3" />
-                    <p className="text-base sm:text-lg font-medium">No Image Available</p>
+                    <p className="text-base sm:text-lg font-medium">Image not found</p>
                   </div>
                 </div>
                 
@@ -393,16 +400,28 @@ const ProductDetail = () => {
                       <Package size={18} className="sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                          Full {product.productType === "tablet" || product.productType === "capsule" ? "Strip" : "Package"}
+                          Full {product.productType === "tablet" || product.productType === "capsule" 
+                            ? "Strip" 
+                            : product.productType === "syrup" 
+                            ? "Bottle" 
+                            : "Package"}
                         </p>
                         <p className="text-xs sm:text-sm text-gray-600">
-                          {product.unitsPerStrip} {product.productType}s per strip
+                          {product.productType === "syrup" 
+                            ? "1 bottle" 
+                            : `${product.unitsPerStrip} ${product.productType}s per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
                         </p>
                       </div>
                     </div>
                     <div className="text-left sm:text-right">
                       <p className="text-lg sm:text-2xl font-bold text-gray-900">Rs. {product.price}</p>
-                      <p className="text-xs sm:text-sm text-gray-600">per strip</p>
+                      <p className="text-xs sm:text-sm text-gray-600">
+                        per {product.productType === "tablet" || product.productType === "capsule" 
+                          ? "strip" 
+                          : product.productType === "syrup" 
+                          ? "bottle" 
+                          : "package"}
+                      </p>
                     </div>
                   </div>
                 </div>
