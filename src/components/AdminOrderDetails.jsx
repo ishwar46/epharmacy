@@ -67,7 +67,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
   const [error, setError] = useState(null);
 
   // Set dynamic title for order details
-  useDynamicTitle(`Order #${orderId} | Order Details | Admin Dashboard | FixPharmacy`);
+  useDynamicTitle(
+    `Order #${orderId} | Order Details | Admin Dashboard | FixPharmacy`
+  );
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);
