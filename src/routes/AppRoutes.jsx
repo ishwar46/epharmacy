@@ -13,6 +13,7 @@ import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
 import ProductCatalog from "../pages/customer/ProductCatalog";
 import ProductDetail from "../pages/customer/ProductDetail";
+import LandingPage from "../pages/LandingPage";
 import Cart from "../pages/customer/Cart";
 import Checkout from "../pages/customer/Checkout";
 import OrderConfirmation from "../pages/customer/OrderConfirmation";
@@ -29,7 +30,7 @@ const AppRoutes = () => {
       <Routes>
       {/* Public routes with navbar */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<ProductCatalog />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/products" element={<ProductCatalog />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />

@@ -460,7 +460,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -470,7 +470,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -480,7 +480,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -490,7 +490,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Digestive", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -500,7 +500,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Heart & Blood", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -510,7 +510,7 @@ const StickyNavbar = () => {
                       onClick={() => {
                         updateSearch("");
                         setFilters({ search: "", category: "Respiratory", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/") navigate("/");
+                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -543,7 +543,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
@@ -554,7 +554,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
@@ -654,7 +654,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -665,7 +665,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -676,7 +676,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -701,7 +701,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -713,7 +713,7 @@ const StickyNavbar = () => {
                     onClick={() => {
                       updateSearch("");
                       setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
-                      if (location.pathname !== "/") navigate("/");
+                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
