@@ -12,11 +12,7 @@ const CartSummary = ({ showActions = true, isMobile = false }) => {
   const formatPrice = (price) => `Rs. ${parseFloat(price).toFixed(2)}`;
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/cart' } });
-      return;
-    }
-    // Navigate to checkout page (to be implemented)
+    // Allow both authenticated and guest checkout
     navigate('/checkout');
   };
 

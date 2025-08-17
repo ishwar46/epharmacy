@@ -341,6 +341,12 @@ const Navbar = () => {
               <span className="hidden lg:inline">Upload </span>Prescription
             </a>
             <a
+              href="/track"
+              className="text-slate-700 hover:text-blue-600 transition-colors text-sm"
+            >
+              Track Order
+            </a>
+            <a
               href="/about"
               className="text-slate-700 hover:text-blue-600 transition-colors text-sm"
             >
@@ -430,6 +436,14 @@ const Navbar = () => {
             >
               <Stethoscope size={18} className="mr-3 text-slate-500" />
               Upload Prescription
+            </a>
+            <a
+              href="/track"
+              className="flex items-center px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors active:bg-slate-100"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Package size={18} className="mr-3 text-slate-500" />
+              Track Order
             </a>
             <a
               href="/about"

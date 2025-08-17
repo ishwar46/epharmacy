@@ -14,6 +14,10 @@ import UsersDashboard from "../pages/UsersDashboard";
 import ProductCatalog from "../pages/customer/ProductCatalog";
 import ProductDetail from "../pages/customer/ProductDetail";
 import Cart from "../pages/customer/Cart";
+import Checkout from "../pages/customer/Checkout";
+import OrderConfirmation from "../pages/customer/OrderConfirmation";
+import OrderHistory from "../pages/customer/OrderHistory";
+import OrderTracking from "../pages/customer/OrderTracking";
 import MainLayout from "../layouts/MainLayout";
 import PlainLayout from "../layouts/PlainLayout";
 import ScrollToTop from "../components/common/ScrollToTop";
@@ -29,6 +33,10 @@ const AppRoutes = () => {
         <Route path="/products" element={<ProductCatalog />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
+        <Route path="/track" element={<OrderTracking />} />
+        <Route path="/track/:orderNumber" element={<OrderTracking />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 
@@ -43,6 +51,11 @@ const AppRoutes = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <UserProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/orders" element={
+          <ProtectedRoute>
+            <OrderHistory />
           </ProtectedRoute>
         } />
       </Route>
