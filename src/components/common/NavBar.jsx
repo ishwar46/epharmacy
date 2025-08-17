@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   ShoppingCart,
@@ -17,29 +18,41 @@ import {
   Settings,
   History,
 } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCart } from "../../contexts/CartContext";
+import { useSearch } from "../../contexts/SearchContext";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { cart } = useCart();
+  const {
+    searchQuery,
+    setSearchQuery,
+    handleSearch: performSearch,
+  } = useSearch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
 
   // Handle search
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
-    setIsSearchOpen(false);
+    if (searchQuery.trim()) {
+      performSearch(searchQuery);
+      setIsSearchOpen(false);
+      navigate("/products");
+    }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
+  const handleLogout = async () => {
+    await logout();
     setIsUserMenuOpen(false);
-    // Add your logout logic here (API calls, redirects, etc.)
-    console.log("Logged out");
+    navigate("/");
+  };
+
+  const handleCartClick = () => {
+    navigate("/cart");
   };
 
   // Close menus when clicking outside
@@ -148,13 +161,14 @@ const Navbar = () => {
 
             {/* Cart - Always visible */}
             <button
+              onClick={handleCartClick}
               className="relative p-2 text-slate-600 hover:text-blue-600 transition-colors"
               aria-label="Shopping cart"
             >
               <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
-              {cartCount > 0 && (
+              {cart.totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
-                  {cartCount > 99 ? "99+" : cartCount}
+                  {cart.totalItems > 99 ? "99+" : cart.totalItems}
                 </span>
               )}
             </button>
@@ -201,36 +215,58 @@ const Navbar = () => {
                       </div>
 
                       <div className="py-1 sm:py-2">
-                        <a
-                          href="/profile"
-                          className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        <button
+                          onClick={() => {
+                            navigate("/profile");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                           <Settings size={16} className="mr-3" />
                           My Profile
-                        </a>
-                        <a
-                          href="/orders"
-                          className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate("/orders");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                           <History size={16} className="mr-3" />
                           Order History
-                        </a>
-                        <a
-                          href="/wishlist"
-                          className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate("/cart");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          <ShoppingCart size={16} className="mr-3" />
+                          My Cart
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate("/wishlist");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                           <Heart size={16} className="mr-3" />
                           Wishlist
-                        </a>
+                        </button>
 
                         {user?.role === "admin" && (
-                          <a
-                            href="/admin"
-                            className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                          <button
+                            onClick={() => {
+                              navigate("/admin");
+                              setIsUserMenuOpen(false);
+                            }}
+                            className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                           >
                             <Package size={16} className="mr-3" />
                             Admin Panel
-                          </a>
+                          </button>
                         )}
                       </div>
 
@@ -248,18 +284,18 @@ const Navbar = () => {
                 </>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <a
-                    href="/login"
+                  <button
+                    onClick={() => navigate("/login")}
                     className="hidden sm:block text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
                   >
                     Sign In
-                  </a>
-                  <a
-                    href="/register"
+                  </button>
+                  <button
+                    onClick={() => navigate("/register")}
                     className="bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md sm:rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
                     Sign Up
-                  </a>
+                  </button>
                 </div>
               )}
             </div>

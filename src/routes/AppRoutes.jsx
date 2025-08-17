@@ -13,6 +13,7 @@ import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
 import ProductCatalog from "../pages/customer/ProductCatalog";
 import ProductDetail from "../pages/customer/ProductDetail";
+import Cart from "../pages/customer/Cart";
 import MainLayout from "../layouts/MainLayout";
 import PlainLayout from "../layouts/PlainLayout";
 import ScrollToTop from "../components/common/ScrollToTop";
@@ -25,7 +26,9 @@ const AppRoutes = () => {
       {/* Public routes with navbar */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<ProductCatalog />} />
+        <Route path="/products" element={<ProductCatalog />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

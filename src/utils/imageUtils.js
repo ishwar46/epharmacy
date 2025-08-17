@@ -52,6 +52,13 @@ export const getProfilePictureURL = (profilePicture) => {
 };
 
 /**
+ * Alias for getImageURL to maintain compatibility
+ * @param {string} imagePath - The image path
+ * @returns {string|null} - Full URL to the image or null
+ */
+export const buildImageUrl = getImageURL;
+
+/**
  * Gets a fallback/default profile picture URL
  * @returns {string} - URL to default profile picture
  */
@@ -81,6 +88,7 @@ export const validateImageURL = (imageUrl) => {
 
 export default {
   getImageURL,
+  buildImageUrl,
   getProfilePictureURL,
   getDefaultProfilePicture,
   validateImageURL

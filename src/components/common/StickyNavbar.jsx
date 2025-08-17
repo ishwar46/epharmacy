@@ -4,6 +4,7 @@ import { scrollToTop } from "../../utils/scrollUtils";
 import { useScrollPosition } from "../../hooks/useScrollPosition";
 import { useSearch } from "../../contexts/SearchContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useCart } from "../../contexts/CartContext";
 import { generateDynamicTitle } from "../../hooks/useDynamicTitle";
 import { getProfilePictureURL } from "../../utils/imageUtils";
 import {
@@ -31,12 +32,12 @@ const StickyNavbar = () => {
   const location = useLocation();
   const { searchQuery, updateSearch } = useSearch();
   const { user, isAuthenticated, logout } = useAuth();
+  const { cart } = useCart();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
-  const [cartCount] = useState(0);
 
   // Smart scroll behavior with throttling to prevent flickering
   const scrollPosition = useScrollPosition(50); // 50ms throttle for smooth performance
@@ -114,6 +115,10 @@ const StickyNavbar = () => {
     await logout();
     setIsUserMenuOpen(false);
     navigate('/');
+  };
+
+  const handleCartClick = () => {
+    navigate('/cart');
   };
 
   // Close menus when clicking outside
@@ -254,6 +259,7 @@ const StickyNavbar = () => {
 
               {/* Cart - Always visible with enhanced compact state */}
               <button
+                onClick={handleCartClick}
                 className="relative p-2 text-slate-600 hover:text-blue-600 transition-colors"
                 aria-label="Shopping cart"
               >
@@ -261,9 +267,9 @@ const StickyNavbar = () => {
                   size={isCompact ? 18 : 20}
                   className="sm:w-6 sm:h-6"
                 />
-                {cartCount > 0 && (
+                {cart.totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
-                    {cartCount > 99 ? "99+" : cartCount}
+                    {cart.totalItems > 99 ? "99+" : cart.totalItems}
                   </span>
                 )}
               </button>
@@ -345,6 +351,21 @@ const StickyNavbar = () => {
                             <History size={16} className="mr-3" />
                             Order History
                           </a>
+                          <button
+                            onClick={() => {
+                              handleCartClick();
+                              setIsUserMenuOpen(false);
+                            }}
+                            className="flex items-center w-full px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                          >
+                            <ShoppingCart size={16} className="mr-3" />
+                            My Cart
+                            {cart.totalItems > 0 && (
+                              <span className="ml-auto bg-blue-600 text-white text-xs rounded-full px-2 py-0.5">
+                                {cart.totalItems}
+                              </span>
+                            )}
+                          </button>
                           <a
                             href="/wishlist"
                             className="flex items-center px-3 sm:px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"

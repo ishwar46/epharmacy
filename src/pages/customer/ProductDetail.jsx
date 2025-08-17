@@ -20,6 +20,7 @@ import {
   Info,
 } from "lucide-react";
 import { getProduct } from "../../services/productService";
+import AddToCartButton from "../../components/cart/AddToCartButton";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -29,7 +30,6 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [purchaseType, setPurchaseType] = useState("package");
   
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -70,10 +70,6 @@ const ProductDetail = () => {
     }
   }, [id]);
 
-  const handleAddToCart = (type, qty = quantity) => {
-    console.log("Adding to cart:", { product, type, quantity: qty });
-    alert(`Added ${qty} ${type}(s) of ${product.name} to cart!`);
-  };
 
   const calculateUnitPrice = () => {
     if (product?.allowUnitSale && product?.unitsPerStrip) {
@@ -82,16 +78,6 @@ const ProductDetail = () => {
     return null;
   };
 
-  const calculateTotalPrice = () => {
-    if (!product) return 0;
-    
-    if (purchaseType === "unit") {
-      const unitPrice = calculateUnitPrice();
-      return (parseFloat(unitPrice) * quantity).toFixed(2);
-    } else {
-      return (product.price * quantity).toFixed(2);
-    }
-  };
 
   if (loading) {
     return (
@@ -375,169 +361,81 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {/* Purchase Options - Mobile First */}
-              <div className="space-y-3 sm:space-y-4">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Purchase Options</h3>
-                
-                {/* Package Option - Mobile Responsive */}
-                <div
-                  className={`border-2 rounded-xl p-3 sm:p-4 cursor-pointer transition-all ${
-                    purchaseType === "package"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setPurchaseType("package")}
-                >
-                  <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-                          purchaseType === "package"
-                            ? "border-blue-500 bg-blue-500"
-                            : "border-gray-300"
-                        }`}
-                      ></div>
-                      <Package size={18} className="sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm sm:text-base">
-                          Full {product.productType === "tablet" || product.productType === "capsule" 
-                            ? "Strip" 
-                            : product.productType === "syrup" 
-                            ? "Bottle" 
-                            : "Package"}
-                        </p>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          {product.productType === "syrup" 
-                            ? "1 bottle" 
-                            : `${product.unitsPerStrip} ${product.productType}s per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-left sm:text-right">
-                      <p className="text-lg sm:text-2xl font-bold text-gray-900">Rs. {product.price}</p>
-                      <p className="text-xs sm:text-sm text-gray-600">
-                        per {product.productType === "tablet" || product.productType === "capsule" 
-                          ? "strip" 
+              {/* Purchase Options - Package */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Purchase as Package</h3>
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Package size={20} className="text-gray-600" />
+                    <div>
+                      <p className="font-semibold text-gray-900">
+                        Full {product.productType === "tablet" || product.productType === "capsule" 
+                          ? "Strip" 
                           : product.productType === "syrup" 
-                          ? "bottle" 
-                          : "package"}
+                          ? "Bottle" 
+                          : "Package"}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {product.productType === "syrup" 
+                          ? "1 bottle" 
+                          : `${product.unitsPerStrip} ${product.productType}s per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
                       </p>
                     </div>
                   </div>
+                  <AddToCartButton 
+                    product={product} 
+                    purchaseType="package" 
+                    size="lg"
+                  />
                 </div>
 
-                {/* Unit Option - Mobile Responsive */}
-                {product.allowUnitSale && unitPrice && (
-                  <div
-                    className={`border-2 rounded-xl p-3 sm:p-4 cursor-pointer transition-all ${
-                      purchaseType === "unit"
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => setPurchaseType("unit")}
-                  >
-                    <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-                            purchaseType === "unit"
-                              ? "border-blue-500 bg-blue-500"
-                              : "border-gray-300"
-                          }`}
-                        ></div>
-                        <Pill size={18} className="sm:w-5 sm:h-5 text-gray-600 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm sm:text-base">Individual {product.productType}</p>
-                          <p className="text-xs sm:text-sm text-gray-600">Single unit purchase</p>
-                        </div>
-                      </div>
-                      <div className="text-left sm:text-right">
-                        <p className="text-lg sm:text-2xl font-bold text-gray-900">Rs. {unitPrice}</p>
-                        <p className="text-xs sm:text-sm text-gray-600">per {product.productType}</p>
+                {/* Unit Purchase Option - Only for tablets and capsules */}
+                {product.allowUnitSale && unitPrice && 
+                 (product.productType === 'tablet' || product.productType === 'capsule') && (
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Pill size={20} className="text-blue-600" />
+                      <div>
+                        <p className="font-semibold text-gray-900">Individual {product.productType}</p>
+                        <p className="text-sm text-gray-600">Buy single units</p>
                       </div>
                     </div>
+                    <AddToCartButton 
+                      product={product} 
+                      purchaseType="unit" 
+                      size="lg"
+                    />
                   </div>
                 )}
               </div>
 
-              {/* Quantity & Add to Cart - Mobile First */}
-              <div className="space-y-3 sm:space-y-4">
-                {/* Quantity Controls - Mobile Centered */}
-                <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
-                  <span className="font-semibold text-gray-900 text-sm sm:text-base">Quantity:</span>
-                  <div className="flex items-center justify-center sm:justify-start space-x-3">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors touch-manipulation"
-                    >
-                      <Minus size={16} className="sm:w-4 sm:h-4" />
-                    </button>
-                    <span className="text-lg sm:text-xl font-semibold min-w-[3rem] text-center px-2">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="p-2 sm:p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors touch-manipulation"
-                    >
-                      <Plus size={16} className="sm:w-4 sm:h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Total Price - Mobile Responsive */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 rounded-xl border border-blue-200">
-                  <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                    <span className="text-base sm:text-lg font-semibold text-gray-900">Total Price:</span>
-                    <span className="text-2xl sm:text-3xl font-bold text-blue-600">
-                      Rs. {calculateTotalPrice()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Add to Cart Button - Mobile Optimized */}
-                <button
-                  onClick={() => handleAddToCart(purchaseType, quantity)}
-                  disabled={product.availableStock === 0}
-                  className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl text-base sm:text-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 sm:space-x-3 touch-manipulation ${
-                    product.availableStock === 0
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl active:scale-95"
-                  }`}
-                >
-                  <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
-                  <span>
-                    {product.availableStock === 0 ? "Out of Stock" : "Add to Cart"}
-                  </span>
-                </button>
-
-                {/* Prescription Warning - Mobile Responsive */}
-                {product.medicineType === "Prescription" && (
-                  <div className="bg-red-50 border border-red-200 p-3 sm:p-4 rounded-xl">
-                    <div className="flex items-start space-x-2 sm:space-x-3">
-                      <AlertCircle size={18} className="sm:w-5 sm:h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold text-red-900 mb-1 text-sm sm:text-base">
-                          Prescription Required
-                        </h4>
-                        <p className="text-xs sm:text-sm text-red-700 leading-relaxed">
-                          This is a prescription medicine. You'll need to upload a valid prescription
-                          from a licensed doctor before we can process your order.
-                        </p>
-                      </div>
+              {/* Prescription Warning */}
+              {product.medicineType === "Prescription" && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-xl">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle size={20} className="text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-red-900 mb-1">
+                        Prescription Required
+                      </h4>
+                      <p className="text-sm text-red-700 leading-relaxed">
+                        This is a prescription medicine. You'll need to upload a valid prescription
+                        from a licensed doctor before we can process your order.
+                      </p>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Trust Indicators - Mobile Responsive */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2 sm:pt-4">
-                  <div className="flex items-center justify-center sm:justify-start space-x-2 text-xs sm:text-sm text-gray-600 bg-gray-50 py-2 px-3 rounded-lg">
-                    <Shield size={14} className="sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
-                    <span>Authentic Products</span>
-                  </div>
-                  <div className="flex items-center justify-center sm:justify-start space-x-2 text-xs sm:text-sm text-gray-600 bg-gray-50 py-2 px-3 rounded-lg">
-                    <CheckCircle size={14} className="sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
-                    <span>Quality Assured</span>
-                  </div>
+              {/* Trust Indicators */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 py-3 px-4 rounded-lg">
+                  <Shield size={16} className="text-green-500 flex-shrink-0" />
+                  <span>Authentic Products</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 py-3 px-4 rounded-lg">
+                  <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+                  <span>Quality Assured</span>
                 </div>
               </div>
             </div>

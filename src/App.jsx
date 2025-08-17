@@ -3,6 +3,7 @@ import AppRoutes from "./routes/AppRoutes";
 import { Toaster } from "react-hot-toast";
 import { SearchProvider } from "./contexts/SearchContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
 import { HelmetProvider } from "react-helmet-async";
 
 const App = () => {
@@ -17,12 +18,14 @@ const App = () => {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <SearchProvider>
-          <Toaster position="top-right" reverseOrder={false} />
-          <div className="App">
-            <AppRoutes />
-          </div>
-        </SearchProvider>
+        <CartProvider>
+          <SearchProvider>
+            <Toaster position="top-right" reverseOrder={false} />
+            <div className="App">
+              <AppRoutes />
+            </div>
+          </SearchProvider>
+        </CartProvider>
       </AuthProvider>
     </HelmetProvider>
   );
