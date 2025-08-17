@@ -125,8 +125,8 @@ const Checkout = () => {
     const files = Array.from(e.target.files);
     
     files.forEach(file => {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast.error('File size should be less than 5MB');
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast.error('File size should be less than 2MB');
         return;
       }
 
@@ -153,6 +153,9 @@ const Checkout = () => {
   const uploadPrescriptionFiles = async () => {
     const unuploadedPrescriptions = prescriptions.filter(p => !p.uploaded && !p.uploading);
     
+    // Track uploads with a local variable to avoid state synchronization issues
+    const uploadResults = [];
+    
     for (const prescription of unuploadedPrescriptions) {
       try {
         // Mark as uploading
@@ -171,6 +174,18 @@ const Checkout = () => {
         const result = await response.json();
 
         if (result.success) {
+          // Store the upload result locally
+          uploadResults.push({
+            id: prescription.id,
+            uploaded: true,
+            uploading: false,
+            fileUrl: result.data.fileUrl,
+            fileName: result.data.fileName,
+            doctorName: prescription.doctorName,
+            hospitalName: prescription.hospitalName,
+            prescriptionDate: prescription.prescriptionDate
+          });
+          
           // Update prescription with uploaded file info
           setPrescriptions(prev => prev.map(p => 
             p.id === prescription.id 
@@ -195,11 +210,11 @@ const Checkout = () => {
           p.id === prescription.id ? { ...p, uploading: false } : p
         ));
         
-        return false; // Stop uploading if one fails
+        return { success: false, uploadResults: [] }; // Return failure
       }
     }
     
-    return true; // All uploads successful
+    return { success: true, uploadResults }; // Return success with results
   };
 
   // Remove prescription
@@ -230,25 +245,45 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      let prescriptionData = [];
+      
       // First, upload prescription files if any
       if (hasPrescriptionItems && prescriptions.length > 0) {
-        const uploadSuccess = await uploadPrescriptionFiles();
-        if (!uploadSuccess) {
+        const uploadResult = await uploadPrescriptionFiles();
+        if (!uploadResult.success) {
           throw new Error('Failed to upload prescription files');
         }
+        
+        // Use the upload results directly instead of relying on React state
+        prescriptionData = uploadResult.uploadResults.map(p => ({
+          doctorName: p.doctorName || '',
+          hospitalName: p.hospitalName || '',
+          prescriptionDate: p.prescriptionDate || '',
+          imageUrl: p.fileUrl,
+          fileName: p.fileName
+        }));
+        
+        // Also include any already uploaded prescriptions from state
+        const alreadyUploaded = prescriptions.filter(p => p.uploaded && p.fileUrl);
+        alreadyUploaded.forEach(p => {
+          // Only add if not already in prescriptionData
+          if (!prescriptionData.find(pd => pd.fileName === p.fileName)) {
+            prescriptionData.push({
+              doctorName: p.doctorName || '',
+              hospitalName: p.hospitalName || '',
+              prescriptionDate: p.prescriptionDate || '',
+              imageUrl: p.fileUrl,
+              fileName: p.fileName
+            });
+          }
+        });
       }
 
       const orderData = {
         deliveryAddress,
         paymentMethod,
         customerNotes: customerNotes.trim(),
-        prescriptions: prescriptions.map(p => ({
-          doctorName: p.doctorName,
-          hospitalName: p.hospitalName,
-          prescriptionDate: p.prescriptionDate,
-          imageUrl: p.fileUrl,
-          fileName: p.fileName || p.file?.name
-        }))
+        prescriptions: prescriptionData
       };
 
       // Add guest details if not authenticated
@@ -605,7 +640,7 @@ const Checkout = () => {
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                       <Upload size={32} className="mx-auto text-gray-400 mb-2" />
                       <p className="text-sm text-gray-600 mb-2">Upload prescription images</p>
-                      <p className="text-xs text-gray-500 mb-4">JPG, PNG, PDF up to 5MB each</p>
+                      <p className="text-xs text-gray-500 mb-4">JPG, PNG, PDF up to 2MB each</p>
                       
                       <input
                         type="file"
