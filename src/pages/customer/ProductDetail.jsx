@@ -30,7 +30,6 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [purchaseType, setPurchaseType] = useState("package");
   
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -361,25 +360,40 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {/* Purchase Options - Package */}
+              {/* Purchase Options - Enhanced Design */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Purchase as Package</h3>
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <Package size={20} className="text-gray-600" />
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        Full {product.productType === "tablet" || product.productType === "capsule" 
-                          ? "Strip" 
-                          : product.productType === "syrup" 
-                          ? "Bottle" 
-                          : "Package"}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {product.productType === "syrup" 
-                          ? "1 bottle" 
-                          : `${product.unitsPerStrip} ${product.productType}s per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
-                      </p>
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                  <ShoppingCart size={20} />
+                  <span>Purchase Options</span>
+                </h3>
+
+                {/* Package Purchase - Primary Option */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <Package size={20} className="text-green-600" />
+                      <div>
+                        <p className="font-semibold text-gray-900 flex items-center space-x-2">
+                          <span>Complete {product.productType === "tablet" || product.productType === "capsule" 
+                            ? "Strip" 
+                            : product.productType === "syrup" 
+                            ? "Bottle" 
+                            : "Package"}</span>
+                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">Recommended</span>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {product.productType === "syrup" 
+                            ? "1 complete bottle" 
+                            : `${product.unitsPerStrip || 10} ${product.productType}s per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
+                        </p>
+                        <p className="text-xs text-green-600 mt-1 font-medium">
+                          Best value • Standard packaging • Most economical
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-green-600">Rs. {product.price}</p>
+                      <p className="text-xs text-gray-500">per {product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}</p>
                     </div>
                   </div>
                   <AddToCartButton 
@@ -392,12 +406,27 @@ const ProductDetail = () => {
                 {/* Unit Purchase Option - Only for tablets and capsules */}
                 {product.allowUnitSale && unitPrice && 
                  (product.productType === 'tablet' || product.productType === 'capsule') && (
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Pill size={20} className="text-blue-600" />
-                      <div>
-                        <p className="font-semibold text-gray-900">Individual {product.productType}</p>
-                        <p className="text-sm text-gray-600">Buy single units</p>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <Pill size={20} className="text-blue-600" />
+                        <div>
+                          <p className="font-semibold text-gray-900 flex items-center space-x-2">
+                            <span>Individual {product.productType.charAt(0).toUpperCase() + product.productType.slice(1)}s</span>
+                            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">Per Unit</span>
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Buy exactly what you need • Perfect for trials
+                          </p>
+                          <p className="text-xs text-blue-600 mt-1 font-medium">
+                            Flexible quantity • Great for trying new medicines
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-blue-600">Rs. {unitPrice}</p>
+                        <p className="text-xs text-gray-500">per {product.productType}</p>
+                        <p className="text-xs text-gray-400">from strips of {product.unitsPerStrip || 10}</p>
                       </div>
                     </div>
                     <AddToCartButton 
@@ -407,6 +436,20 @@ const ProductDetail = () => {
                     />
                   </div>
                 )}
+
+                {/* Info for non-unit products */}
+                {!product.allowUnitSale || !['tablet', 'capsule'].includes(product.productType) ? (
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Info size={16} />
+                      <span>
+                        {product.productType === 'tablet' || product.productType === 'capsule' 
+                          ? 'This product is only available as complete strips' 
+                          : `${product.productType.charAt(0).toUpperCase() + product.productType.slice(1)}s are only available as complete packages`}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {/* Prescription Warning */}

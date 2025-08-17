@@ -26,7 +26,6 @@ const Footer = () => {
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
-          
           {/* Company Info - Mobile First */}
           <div className="sm:col-span-2 xl:col-span-1 space-y-4 lg:space-y-6">
             <div className="flex items-center space-x-3">
@@ -36,42 +35,63 @@ const Footer = () => {
                 className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
               />
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold" style={{ color: "#4A90E2" }}>
+                <h3
+                  className="text-xl sm:text-2xl font-bold"
+                  style={{ color: "#4A90E2" }}
+                >
                   FixPharmacy
                 </h3>
-                <p className="text-sm text-slate-300" style={{ color: "#4CAF50" }}>
+                <p
+                  className="text-sm text-slate-300"
+                  style={{ color: "#4CAF50" }}
+                >
                   Your Health Partner
                 </p>
               </div>
             </div>
-            
+
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Your trusted online pharmacy providing authentic medicines and healthcare products 
-              with fast delivery across Nepal. Licensed, reliable, and committed to your health.
+              Your trusted online pharmacy providing authentic medicines and
+              healthcare products with fast delivery across Nepal. Licensed,
+              reliable, and committed to your health.
             </p>
-            
+
             {/* Trust Badges */}
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <div className="flex items-center space-x-2 bg-slate-800 px-3 py-2 rounded-full">
                 <Shield size={16} className="text-green-400" />
-                <span className="text-xs sm:text-sm text-slate-200">Licensed</span>
+                <span className="text-xs sm:text-sm text-slate-200">
+                  Licensed
+                </span>
               </div>
               <div className="flex items-center space-x-2 bg-slate-800 px-3 py-2 rounded-full">
                 <Award size={16} className="text-blue-400" />
-                <span className="text-xs sm:text-sm text-slate-200">Verified</span>
+                <span className="text-xs sm:text-sm text-slate-200">
+                  Verified
+                </span>
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4 lg:space-y-6">
-            <h4 className="text-lg sm:text-xl font-semibold text-white">Quick Links</h4>
+            <h4 className="text-lg sm:text-xl font-semibold text-white">
+              Quick Links
+            </h4>
             <nav className="space-y-2 sm:space-y-3">
               {[
                 { name: "Home", href: "/" },
                 { name: "Medicines", href: "/medicines", icon: Pill },
-                { name: "Health Products", href: "/health-products", icon: Package },
-                { name: "Upload Prescription", href: "/prescriptions", icon: Stethoscope },
+                {
+                  name: "Health Products",
+                  href: "/health-products",
+                  icon: Package,
+                },
+                {
+                  name: "Upload Prescription",
+                  href: "/prescriptions",
+                  icon: Stethoscope,
+                },
                 { name: "About Us", href: "/about" },
                 { name: "Contact", href: "/contact" },
               ].map((link) => (
@@ -81,9 +101,14 @@ const Footer = () => {
                   className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors text-sm sm:text-base group"
                 >
                   {link.icon && (
-                    <link.icon size={16} className="text-slate-400 group-hover:text-blue-400 transition-colors" />
+                    <link.icon
+                      size={16}
+                      className="text-slate-400 group-hover:text-blue-400 transition-colors"
+                    />
                   )}
-                  <span className="group-hover:translate-x-1 transition-transform">{link.name}</span>
+                  <span className="group-hover:translate-x-1 transition-transform">
+                    {link.name}
+                  </span>
                 </a>
               ))}
             </nav>
@@ -91,19 +116,44 @@ const Footer = () => {
 
           {/* Services & Features */}
           <div className="space-y-4 lg:space-y-6">
-            <h4 className="text-lg sm:text-xl font-semibold text-white">Our Services</h4>
+            <h4 className="text-lg sm:text-xl font-semibold text-white">
+              Our Services
+            </h4>
             <div className="space-y-3 sm:space-y-4">
               {[
-                { icon: Truck, title: "Fast Delivery", desc: "Same day delivery in Biratnagar" },
-                { icon: CreditCard, title: "Secure Payment", desc: "Multiple payment options" },
-                { icon: Shield, title: "Authentic Products", desc: "100% genuine medicines" },
-                { icon: Clock, title: "24/7 Support", desc: "Round the clock assistance" },
+                {
+                  icon: Truck,
+                  title: "Fast Delivery",
+                  desc: "Same day delivery in Biratnagar",
+                },
+                {
+                  icon: CreditCard,
+                  title: "Secure Payment",
+                  desc: "Multiple payment options",
+                },
+                {
+                  icon: Shield,
+                  title: "Authentic Products",
+                  desc: "100% genuine medicines",
+                },
+                {
+                  icon: Clock,
+                  title: "24/7 Support",
+                  desc: "Round the clock assistance",
+                },
               ].map((service, index) => (
                 <div key={index} className="flex items-start space-x-3">
-                  <service.icon size={18} className="text-blue-400 mt-1 flex-shrink-0" />
+                  <service.icon
+                    size={18}
+                    className="text-blue-400 mt-1 flex-shrink-0"
+                  />
                   <div>
-                    <h5 className="font-medium text-white text-sm sm:text-base">{service.title}</h5>
-                    <p className="text-slate-400 text-xs sm:text-sm">{service.desc}</p>
+                    <h5 className="font-medium text-white text-sm sm:text-base">
+                      {service.title}
+                    </h5>
+                    <p className="text-slate-400 text-xs sm:text-sm">
+                      {service.desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -112,24 +162,37 @@ const Footer = () => {
 
           {/* Contact Info & Social */}
           <div className="space-y-4 lg:space-y-6">
-            <h4 className="text-lg sm:text-xl font-semibold text-white">Contact Info</h4>
+            <h4 className="text-lg sm:text-xl font-semibold text-white">
+              Contact Info
+            </h4>
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-start space-x-3">
-                <MapPin size={16} className="sm:w-5 sm:h-5 text-blue-400 mt-1 flex-shrink-0" />
+                <MapPin
+                  size={16}
+                  className="sm:w-5 sm:h-5 text-blue-400 mt-1 flex-shrink-0"
+                />
                 <div>
-                  <h5 className="font-medium text-white text-sm sm:text-base">Address</h5>
+                  <h5 className="font-medium text-white text-sm sm:text-base">
+                    Address
+                  </h5>
                   <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                    Bargachhi Chowk<br />
+                    Bargachhi Chowk
+                    <br />
                     Biratnagar, Nepal
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-3">
-                <Phone size={16} className="sm:w-5 sm:h-5 text-green-400 mt-1 flex-shrink-0" />
+                <Phone
+                  size={16}
+                  className="sm:w-5 sm:h-5 text-green-400 mt-1 flex-shrink-0"
+                />
                 <div>
-                  <h5 className="font-medium text-white text-sm sm:text-base">Phone</h5>
-                  <a 
+                  <h5 className="font-medium text-white text-sm sm:text-base">
+                    Phone
+                  </h5>
+                  <a
                     href="tel:+977-1-4445566"
                     className="text-slate-300 hover:text-green-400 transition-colors text-xs sm:text-sm"
                   >
@@ -137,12 +200,17 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-3">
-                <Mail size={16} className="sm:w-5 sm:h-5 text-purple-400 mt-1 flex-shrink-0" />
+                <Mail
+                  size={16}
+                  className="sm:w-5 sm:h-5 text-purple-400 mt-1 flex-shrink-0"
+                />
                 <div>
-                  <h5 className="font-medium text-white text-sm sm:text-base">Email</h5>
-                  <a 
+                  <h5 className="font-medium text-white text-sm sm:text-base">
+                    Email
+                  </h5>
+                  <a
                     href="mailto:info@fixpharmacy.com"
                     className="text-slate-300 hover:text-purple-400 transition-colors text-xs sm:text-sm"
                   >
@@ -150,25 +218,54 @@ const Footer = () => {
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-3">
-                <Clock size={16} className="sm:w-5 sm:h-5 text-yellow-400 mt-1 flex-shrink-0" />
+                <Clock
+                  size={16}
+                  className="sm:w-5 sm:h-5 text-yellow-400 mt-1 flex-shrink-0"
+                />
                 <div>
-                  <h5 className="font-medium text-white text-sm sm:text-base">Hours</h5>
-                  <p className="text-slate-300 text-xs sm:text-sm">24/7 Available</p>
+                  <h5 className="font-medium text-white text-sm sm:text-base">
+                    Hours
+                  </h5>
+                  <p className="text-slate-300 text-xs sm:text-sm">
+                    24/7 Available
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Social Media */}
             <div className="pt-2 sm:pt-4">
-              <h5 className="font-medium text-white mb-3 text-sm sm:text-base">Follow Us</h5>
+              <h5 className="font-medium text-white mb-3 text-sm sm:text-base">
+                Follow Us
+              </h5>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
-                  { icon: Facebook, href: "#", color: "hover:text-blue-500", label: "Facebook" },
-                  { icon: Twitter, href: "#", color: "hover:text-sky-400", label: "Twitter" },
-                  { icon: Instagram, href: "#", color: "hover:text-pink-500", label: "Instagram" },
-                  { icon: Linkedin, href: "#", color: "hover:text-blue-600", label: "LinkedIn" },
+                  {
+                    icon: Facebook,
+                    href: "#",
+                    color: "hover:text-blue-500",
+                    label: "Facebook",
+                  },
+                  {
+                    icon: Twitter,
+                    href: "#",
+                    color: "hover:text-sky-400",
+                    label: "Twitter",
+                  },
+                  {
+                    icon: Instagram,
+                    href: "#",
+                    color: "hover:text-pink-500",
+                    label: "Instagram",
+                  },
+                  {
+                    icon: Linkedin,
+                    href: "#",
+                    color: "hover:text-blue-600",
+                    label: "LinkedIn",
+                  },
                 ].map((social, index) => (
                   <a
                     key={index}
@@ -185,8 +282,10 @@ const Footer = () => {
 
           {/* Location Map */}
           <div className="sm:col-span-2 xl:col-span-1 space-y-4 lg:space-y-6">
-            <h4 className="text-lg sm:text-xl font-semibold text-white">Find Us</h4>
-            
+            <h4 className="text-lg sm:text-xl font-semibold text-white">
+              Find Us
+            </h4>
+
             {/* Map Container */}
             <div className="relative rounded-xl overflow-hidden shadow-lg bg-slate-800 h-48 sm:h-56 lg:h-64">
               <iframe
@@ -200,10 +299,10 @@ const Footer = () => {
                 className="absolute inset-0 w-full h-full"
                 title="FixPharmacy Location - Bargachhi Chowk, Biratnagar"
               ></iframe>
-              
+
               {/* Overlay for better integration */}
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-900/20 to-transparent"></div>
-              
+
               {/* Custom Marker Overlay */}
               <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-medium shadow-lg">
                 <div className="flex items-center space-x-1">
@@ -212,7 +311,7 @@ const Footer = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Map Actions */}
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <a
@@ -243,10 +342,11 @@ const Footer = () => {
                 Stay Updated with Health Tips
               </h4>
               <p className="text-slate-300 text-xs sm:text-sm lg:text-base leading-relaxed">
-                Subscribe to get health tips, medicine info, and exclusive offers delivered to your inbox.
+                Subscribe to get health tips, medicine info, and exclusive
+                offers delivered to your inbox.
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full lg:w-auto lg:max-w-md xl:max-w-lg">
               <input
                 type="email"
@@ -267,20 +367,22 @@ const Footer = () => {
           <div className="flex flex-col space-y-3 sm:space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div className="text-center lg:text-left order-2 lg:order-1">
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                © 2024 FixPharmacy. All rights reserved.<br className="sm:hidden" />
-                <span className="hidden sm:inline"> | </span>Licensed Pharmacy in Nepal
+                © 2024 FixPharmacy. All rights reserved.
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline"> | </span>Licensed Pharmacy
+                in Nepal
               </p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-end space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 text-xs sm:text-sm order-1 lg:order-2">
               {[
                 { name: "Privacy Policy", href: "/privacy" },
                 { name: "Terms of Service", href: "/terms" },
                 { name: "Return Policy", href: "/returns" },
               ].map((link, index) => (
-                <a 
+                <a
                   key={index}
-                  href={link.href} 
+                  href={link.href}
                   className="text-slate-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-slate-800"
                 >
                   {link.name}

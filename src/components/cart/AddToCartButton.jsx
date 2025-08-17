@@ -14,10 +14,9 @@ const AddToCartButton = ({
   const [isChecking, setIsChecking] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Safeguard: Force 'package' for non-tablet/capsule products when 'unit' is requested
+  // Safeguard: STRICT enforcement - only tablets and capsules can be sold per unit
   const safePurchaseType = (purchaseType === 'unit' && 
-    product.productType !== 'tablet' && 
-    product.productType !== 'capsule') 
+    (!['tablet', 'capsule'].includes(product.productType) || !product.allowUnitSale)) 
     ? 'package' 
     : purchaseType;
 
@@ -58,10 +57,14 @@ const AddToCartButton = ({
   };
 
   const getPurchaseTypeLabel = () => {
-    if (safePurchaseType === 'unit') {
-      return product.productType === 'tablet' ? 'Tablets' : 
-             product.productType === 'capsule' ? 'Capsules' : 'Units';
+    if (safePurchaseType === 'unit' && ['tablet', 'capsule'].includes(product.productType) && product.allowUnitSale) {
+      return product.productType === 'tablet' ? 'Tablets' : 'Capsules';
     }
+    // For package purchases, use specific terms
+    if (product.productType === 'syrup') return 'Bottles';
+    if (product.productType === 'tablet' || product.productType === 'capsule') return 'Strips';
+    if (product.productType === 'cream') return 'Tubes';
+    if (product.productType === 'injection') return 'Vials';
     return 'Packages';
   };
 
@@ -163,10 +166,29 @@ const AddToCartButton = ({
         </div>
       )}
 
-      {/* Purchase Type Info */}
-      {safePurchaseType === 'unit' && product.allowUnitSale && (
+      {/* Purchase Type Info - Enhanced messaging */}
+      {safePurchaseType === 'unit' && ['tablet', 'capsule'].includes(product.productType) && product.allowUnitSale && (
         <div className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded-lg p-2">
-          Individual {getPurchaseTypeLabel().toLowerCase()} from strips ({product.unitsPerStrip || 10} per strip)
+          <div className="flex items-center space-x-1">
+            <span className="font-medium">Individual {getPurchaseTypeLabel().toLowerCase()}</span>
+            <span>• Taken from strips of {product.unitsPerStrip || 10}</span>
+          </div>
+          <div className="text-blue-500 mt-1">
+            Perfect for trying new medicines or precise dosing
+          </div>
+        </div>
+      )}
+      
+      {/* Package Type Info */}
+      {safePurchaseType === 'package' && ['tablet', 'capsule'].includes(product.productType) && (
+        <div className="text-xs text-green-600 bg-green-50 border border-green-200 rounded-lg p-2">
+          <div className="flex items-center space-x-1">
+            <span className="font-medium">Complete strip</span>
+            <span>• {product.unitsPerStrip || 10} {product.productType}s</span>
+          </div>
+          <div className="text-green-500 mt-1">
+            Best value for regular medication
+          </div>
         </div>
       )}
 

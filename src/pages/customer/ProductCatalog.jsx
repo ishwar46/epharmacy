@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../contexts/SearchContext";
+import { useCart } from "../../contexts/CartContext";
 import SEO from "../../components/common/SEO";
 import {
   generateDynamicTitle,
@@ -97,10 +98,19 @@ const ProductCatalog = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleAddToCart = (product, purchaseType, quantity = 1) => {
-    // This will be connected to your cart API
-    console.log("Adding to cart:", { product, purchaseType, quantity });
-    alert(`Added ${quantity} ${purchaseType}(s) of ${product.name} to cart!`);
+  const { addToCart, loading: cartLoading } = useCart();
+
+  const handleAddToCart = async (product, purchaseType, quantity = 1) => {
+    try {
+      const success = await addToCart(product._id, quantity, purchaseType);
+      if (success) {
+        // Success toast is already shown by the cart context
+        console.log("Successfully added to cart:", { product: product.name, purchaseType, quantity });
+      }
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      // Error toast is already shown by the cart context
+    }
   };
 
   const ProductCard = ({ product }) => {
@@ -322,38 +332,38 @@ const ProductCatalog = () => {
             {/* Package Option */}
             <button
               onClick={() => handleAddToCart(product, "package")}
-              disabled={product.availableStock === 0}
+              disabled={product.availableStock === 0 || cartLoading}
               className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-md text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-                product.availableStock === 0
+                product.availableStock === 0 || cartLoading
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md"
               }`}
             >
               <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
               <span>
-                Add {product.productType === "tablet" || product.productType === "capsule" 
+                {cartLoading ? "Adding..." : `Add ${product.productType === "tablet" || product.productType === "capsule" 
                   ? "Strip/Package" 
                   : product.productType === "syrup" 
                   ? "Bottle" 
-                  : "Package"}
+                  : "Package"}`}
               </span>
-              <span className="font-bold">Rs. {product.price}</span>
+              {!cartLoading && <span className="font-bold">Rs. {product.price}</span>}
             </button>
 
-            {/* Unit Option (if available) */}
-            {product.allowUnitSale && unitPrice && (
+            {/* Unit Option (if available) - Only for tablets and capsules */}
+            {product.allowUnitSale && unitPrice && ['tablet', 'capsule'].includes(product.productType) && (
               <button
                 onClick={() => handleAddToCart(product, "unit")}
-                disabled={product.availableStock === 0}
+                disabled={product.availableStock === 0 || cartLoading}
                 className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-md text-xs sm:text-sm font-semibold border-2 transition-all duration-200 flex items-center justify-center space-x-2 ${
-                  product.availableStock === 0
+                  product.availableStock === 0 || cartLoading
                     ? "border-gray-200 text-gray-400 cursor-not-allowed"
                     : "border-blue-200 text-blue-700 hover:border-blue-300 hover:bg-blue-50"
                 }`}
               >
                 <Pill size={14} className="sm:w-4 sm:h-4" />
-                <span>Add Individual</span>
-                <span className="font-bold">Rs. {unitPrice}</span>
+                <span>{cartLoading ? "Adding..." : "Add Individual"}</span>
+                {!cartLoading && <span className="font-bold">Rs. {unitPrice}</span>}
               </button>
             )}
           </div>
@@ -361,6 +371,20 @@ const ProductCatalog = () => {
       </article>
     );
   };
+
+  // Generate dynamic title based on current state (must be before conditional returns)
+  const dynamicTitle = generateDynamicTitle({
+    page: "catalog",
+    search: filters.search,
+    category: filters.category,
+    medicineType: filters.medicineType,
+    isLoading: loading,
+    resultCount: totalProducts,
+    hasResults: products.length > 0,
+  });
+
+  // Update document title in real-time (hook must be called at top level)
+  useDynamicTitle(dynamicTitle);
 
   if (error) {
     return (
@@ -384,20 +408,6 @@ const ProductCatalog = () => {
       </div>
     );
   }
-
-  // Generate dynamic title based on current state
-  const dynamicTitle = generateDynamicTitle({
-    page: "catalog",
-    search: filters.search,
-    category: filters.category,
-    medicineType: filters.medicineType,
-    isLoading: loading,
-    resultCount: totalProducts,
-    hasResults: products.length > 0,
-  });
-
-  // Update document title in real-time
-  useDynamicTitle(dynamicTitle);
 
   // Generate dynamic SEO data based on filters
   const generateSEOData = () => {

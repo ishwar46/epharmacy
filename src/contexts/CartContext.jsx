@@ -102,7 +102,13 @@ export const CartProvider = ({ children }) => {
       console.log('Trying to update cart item:', {
         productId: productIdString,
         purchaseType,
-        quantity
+        quantity,
+        currentCart: cart,
+        cartItems: cart.items.map(item => ({
+          productId: item.product._id || item.product,
+          purchaseType: item.purchaseType,
+          quantity: item.quantity
+        }))
       });
       
       const response = await cartAPI.updateCartItem({
@@ -112,8 +118,11 @@ export const CartProvider = ({ children }) => {
         guestId
       });
       
+      console.log('Update cart response:', response);
+      
       if (response.success) {
         setCart(response.data);
+        console.log('Cart updated successfully:', response.data);
         if (quantity === 0) {
           toast.success('Item removed from cart');
         } else {
@@ -202,14 +211,14 @@ export const CartProvider = ({ children }) => {
   // Get cart item by product and purchase type
   const getCartItem = (productId, purchaseType) => {
     return cart.items.find(
-      item => item.product._id === productId && item.purchaseType === purchaseType
+      item => (item.product._id || item.product) === productId && item.purchaseType === purchaseType
     );
   };
 
   // Get total quantity for a specific product (across all purchase types)
   const getProductQuantity = (productId) => {
     return cart.items
-      .filter(item => item.product._id === productId)
+      .filter(item => (item.product._id || item.product) === productId)
       .reduce((total, item) => total + item.quantity, 0);
   };
 
