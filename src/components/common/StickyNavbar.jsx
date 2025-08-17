@@ -30,7 +30,7 @@ import {
 const StickyNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { searchQuery, updateSearch } = useSearch();
+  const { searchQuery, updateSearch, setFilters } = useSearch();
   const { user, isAuthenticated, logout } = useAuth();
   const { cart } = useCart();
 
@@ -135,27 +135,27 @@ const StickyNavbar = () => {
 
   return (
     <>
-      {/* Top Info Bar - Hidden when compact */}
+      {/* Top Info Bar - Hidden when compact and on mobile */}
       <div
-        className={`bg-slate-50 border-b border-gray-100 transition-all duration-300 ${
+        className={`hidden sm:block bg-slate-50 border-b border-gray-100 transition-all duration-300 ${
           isCompact ? "h-0 overflow-hidden opacity-0" : "h-auto opacity-100"
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-between py-2 text-xs sm:text-sm text-slate-600">
-            <div className="flex items-center space-x-3 sm:space-x-6">
-              <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-4 sm:space-x-6">
+              <div className="flex items-center space-x-2">
                 <Phone size={12} className="sm:w-3.5 sm:h-3.5" />
                 <span className="hidden sm:inline">+977-1-4445566</span>
-                <span className="sm:hidden">Call</span>
+                <span className="sm:hidden">+977-1-4445566</span>
               </div>
               <div className="hidden md:flex items-center space-x-1">
                 <MapPin size={14} />
                 <span>Bargachhi Chowk, Biratnagar, Nepal</span>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="hidden sm:flex items-center space-x-1">
                 <Clock size={12} className="sm:w-3.5 sm:h-3.5" />
-                <span>24/7</span>
+                <span>24/7 Available</span>
               </div>
             </div>
             <div className="hidden lg:flex items-center space-x-4 text-xs">
@@ -443,20 +443,135 @@ const StickyNavbar = () => {
               >
                 <span>Home</span>
               </button>
-              <button
-                onClick={() => navigate("/")}
-                className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
-              >
-                <Pill size={14} className="sm:w-4 sm:h-4" />
-                <span>Medicines</span>
-              </button>
-              <button
-                onClick={() => navigate("/health-products")}
-                className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
-              >
-                <Package size={14} className="sm:w-4 sm:h-4" />
-                <span>Health Products</span>
-              </button>
+              
+              {/* Categories Dropdown */}
+              <div className="relative group">
+                <button
+                  className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
+                >
+                  <Pill size={14} className="sm:w-4 sm:h-4" />
+                  <span>Categories</span>
+                  <ChevronDown size={12} className="sm:w-3 sm:h-3" />
+                </button>
+                
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  <div className="grid grid-cols-2 gap-1 p-2">
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Pain Relief
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Antibiotics
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Vitamins
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Digestive", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Digestive
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Heart & Blood", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Heart & Blood
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateSearch("");
+                        setFilters({ search: "", category: "Respiratory", medicineType: "", page: 1, limit: 12 });
+                        if (location.pathname !== "/") navigate("/");
+                      }}
+                      className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
+                    >
+                      Respiratory
+                    </button>
+                  </div>
+                  <div className="border-t border-slate-100 mt-2 pt-2">
+                    <button
+                      onClick={() => navigate("/")}
+                      className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                    >
+                      <span>View All Categories</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Medicine Types Dropdown */}
+              <div className="relative group">
+                <button
+                  className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
+                >
+                  <Package size={14} className="sm:w-4 sm:h-4" />
+                  <span>Medicine Types</span>
+                  <ChevronDown size={12} className="sm:w-3 sm:h-3" />
+                </button>
+                
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                    }}
+                    className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    OTC Medicines
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                    }}
+                    className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                    Prescription Required
+                  </button>
+                  <div className="border-t border-slate-100 mt-2 pt-2">
+                    <button
+                      onClick={() => navigate("/")}
+                      className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                    >
+                      <span>View All Types</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={() => navigate("/prescriptions")}
                 className="text-slate-700 hover:text-blue-600 transition-colors text-sm"
@@ -530,22 +645,84 @@ const StickyNavbar = () => {
               >
                 Home
               </a>
-              <a
-                href="/"
-                className="flex items-center px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Pill size={18} className="mr-3 text-slate-500" />
-                Medicines
-              </a>
-              <a
-                href="/health-products"
-                className="flex items-center px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Package size={18} className="mr-3 text-slate-500" />
-                Health Products
-              </a>
+              
+              {/* Categories Section */}
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Categories</p>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
+                  >
+                    Pain Relief
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
+                  >
+                    Antibiotics
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
+                  >
+                    Vitamins
+                  </button>
+                  <a
+                    href="/"
+                    className="flex items-center px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors text-sm font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    View All Categories →
+                  </a>
+                </div>
+              </div>
+
+              {/* Medicine Types Section */}
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Medicine Types</p>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
+                  >
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    OTC Medicines
+                  </button>
+                  <button
+                    onClick={() => {
+                      updateSearch("");
+                      setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
+                      if (location.pathname !== "/") navigate("/");
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
+                  >
+                    <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                    Prescription Required
+                  </button>
+                </div>
+              </div>
               <a
                 href="/prescriptions"
                 className="flex items-center px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors"

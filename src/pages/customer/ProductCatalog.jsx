@@ -21,6 +21,7 @@ import {
   Award,
   Clock,
   Eye,
+  X,
 } from "lucide-react";
 import { getProducts, getCategories } from "../../services/productService";
 
@@ -123,25 +124,25 @@ const ProductCatalog = () => {
 
     return (
       <article
-        className="group bg-white rounded-md sm:rounded-md shadow-sm hover:shadow-lg transition-all duration-300 p-4 sm:p-6 border border-gray-100 hover:border-green-200 relative overflow-hidden"
+        className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-3 sm:p-4 border border-gray-100 hover:border-blue-200 relative overflow-hidden"
         itemScope
         itemType="https://schema.org/Product"
       >
         {/* Favorite Button */}
         <button
           onClick={() => setIsFavorite(!isFavorite)}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-1.5 sm:p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white transition-all duration-200"
+          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white transition-all duration-200"
         >
           <Heart
-            size={16}
-            className={`sm:w-[18px] sm:h-[18px] ${
+            size={14}
+            className={`${
               isFavorite ? "text-red-500 fill-current" : "text-gray-400"
             } hover:text-red-500 transition-colors`}
           />
         </button>
 
         {/* Product Image */}
-        <div className="relative h-36 sm:h-48 bg-gray-50 rounded-sm sm:rounded-sm mb-4 sm:mb-5 flex items-center justify-center overflow-hidden group/image">
+        <div className="relative h-32 sm:h-40 bg-gray-50 rounded-md mb-3 flex items-center justify-center overflow-hidden group/image">
           {product.images && product.images.length > 0 ? (
             <img
               src={`${API_BASE_URL}${product.images[0]}`}
@@ -176,7 +177,7 @@ const ProductCatalog = () => {
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <button
               onClick={() => navigate(`/product/${product._id}`)}
-              className="bg-white text-gray-900 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 hover:bg-gray-100 transition-colors"
+              className="bg-white text-gray-900 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <Eye size={16} />
               <span>View Details</span>
@@ -185,58 +186,44 @@ const ProductCatalog = () => {
         </div>
 
         {/* Product Info */}
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-2.5">
           {/* Medicine Type & Category */}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center space-x-2">
-              <span
-                className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1 ${
-                  product.medicineType === "Prescription"
-                    ? "bg-red-100 text-red-700 border border-red-200"
-                    : "bg-green-100 text-green-700 border border-green-200"
-                }`}
-              >
-                {product.medicineType === "Prescription" && (
-                  <AlertCircle size={10} className="sm:w-3 sm:h-3" />
-                )}
-                <span>{product.medicineType}</span>
-              </span>
-            </div>
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 sm:px-3 py-1 rounded-full font-medium">
+          <div className="flex items-center justify-between flex-wrap gap-1.5">
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center space-x-1 ${
+                product.medicineType === "Prescription"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-green-100 text-green-700"
+              }`}
+            >
+              {product.medicineType === "Prescription" && (
+                <AlertCircle size={10} />
+              )}
+              <span>{product.medicineType}</span>
+            </span>
+            <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
               {product.category}
             </span>
           </div>
 
-          {/* Product Name & Brand */}
-          <div className="space-y-2">
+          {/* Product Name & Description */}
+          <div className="space-y-1.5">
             <h3
-              className="font-bold text-base sm:text-lg text-gray-900 line-clamp-2 leading-tight cursor-pointer hover:text-blue-600 transition-colors"
+              className="font-semibold text-sm leading-tight line-clamp-2 text-gray-900 cursor-pointer transition-colors"
               onClick={() => navigate(`/product/${product._id}`)}
               itemProp="name"
+              onMouseEnter={(e) => {
+                e.target.style.color = "#4CAF50";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = "#111827"; // text-gray-900
+              }}
             >
               {product.name}
             </h3>
-            <div
-              className="flex items-center space-x-2"
-              itemProp="brand"
-              itemScope
-              itemType="https://schema.org/Brand"
-            >
-              <Award
-                size={12}
-                className="sm:w-[14px] sm:h-[14px] text-blue-500"
-                aria-hidden="true"
-              />
-              <p
-                className="text-sm text-blue-600 font-semibold"
-                itemProp="name"
-              >
-                {product.brand}
-              </p>
-            </div>
             {product.description && (
               <p
-                className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed"
+                className="text-xs text-gray-600 line-clamp-1 leading-relaxed"
                 itemProp="description"
               >
                 {product.description}
@@ -246,21 +233,22 @@ const ProductCatalog = () => {
 
           {/* Pricing */}
           <div
-            className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-2"
+            className="bg-gray-50 rounded-md p-2.5 space-y-1.5"
             itemProp="offers"
             itemScope
             itemType="https://schema.org/Offer"
           >
-            <div className="flex items-baseline justify-between">
+            {/* Main Price */}
+            <div className="flex items-center justify-between">
               <div className="flex items-baseline space-x-1">
                 <span
-                  className="text-xl sm:text-2xl font-bold text-gray-900"
+                  className="text-lg font-bold text-gray-900"
                   itemProp="price"
                   content={product.price}
                 >
                   Rs. {product.price}
                 </span>
-                <span className="text-xs sm:text-sm text-gray-600 font-medium">
+                <span className="text-xs text-gray-600">
                   /{" "}
                   {product.productType === "tablet" ||
                   product.productType === "capsule"
@@ -279,41 +267,45 @@ const ProductCatalog = () => {
                   }
                 />
               </div>
+            </div>
+            
+            {/* Secondary Info Row */}
+            <div className="flex items-center justify-between">
+              {unitPrice ? (
+                <span className="text-xs text-gray-700">
+                  <span className="font-medium">Rs. {unitPrice}</span> per{" "}
+                  {product.productType}
+                </span>
+              ) : (
+                <span className="text-xs text-gray-500">
+                  {product.productType === "syrup" 
+                    ? "1 bottle" 
+                    : `${product.unitsPerStrip} per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
+                </span>
+              )}
+              
               {product.medicineType === "Prescription" && (
-                <span className="text-xs text-red-600 flex items-center font-medium">
+                <span className="text-xs text-red-600 flex items-center">
                   <AlertCircle size={10} className="mr-1" />
                   Rx Required
                 </span>
               )}
             </div>
-            {unitPrice && (
-              <div className="flex items-center justify-between text-xs sm:text-sm">
-                <span className="text-gray-700">
-                  <span className="font-semibold">Rs. {unitPrice}</span> per{" "}
-                  {product.productType}
-                </span>
-                <span className="text-xs text-gray-500 bg-white/80 px-2 py-1 rounded-full">
-                  {product.productType === "syrup" 
-                    ? "1 bottle" 
-                    : `${product.unitsPerStrip} per ${product.productType === "tablet" || product.productType === "capsule" ? "strip" : "package"}`}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Stock Status */}
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-between py-1.5">
+            <div className="flex items-center space-x-1.5">
               <div
-                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${
+                className={`w-2 h-2 rounded-full ${
                   product.availableStock > 10
                     ? "bg-green-500"
                     : product.availableStock > 0
                     ? "bg-yellow-500"
                     : "bg-red-500"
-                } shadow-sm`}
+                }`}
               ></div>
-              <span className="text-xs sm:text-sm font-medium text-gray-700">
+              <span className="text-xs font-medium text-gray-700">
                 {product.availableStock > 10
                   ? "In Stock"
                   : product.availableStock > 0
@@ -322,51 +314,39 @@ const ProductCatalog = () => {
               </span>
             </div>
             <div className="flex items-center text-xs text-gray-500">
-              <Clock size={10} className="sm:w-3 sm:h-3 mr-1" />
+              <Clock size={10} className="mr-1" />
               Fast Delivery
             </div>
           </div>
 
-          {/* Add to Cart Buttons */}
-          <div className="space-y-2 sm:space-y-3 pt-2">
-            {/* Package Option */}
-            <button
-              onClick={() => handleAddToCart(product, "package")}
-              disabled={product.availableStock === 0 || cartLoading}
-              className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-md text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-                product.availableStock === 0 || cartLoading
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md"
-              }`}
-            >
-              <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
-              <span>
-                {cartLoading ? "Adding..." : `Add ${product.productType === "tablet" || product.productType === "capsule" 
-                  ? "Strip/Package" 
-                  : product.productType === "syrup" 
-                  ? "Bottle" 
-                  : "Package"}`}
-              </span>
-              {!cartLoading && <span className="font-bold">Rs. {product.price}</span>}
-            </button>
-
-            {/* Unit Option (if available) - Only for tablets and capsules */}
-            {product.allowUnitSale && unitPrice && ['tablet', 'capsule'].includes(product.productType) && (
-              <button
-                onClick={() => handleAddToCart(product, "unit")}
-                disabled={product.availableStock === 0 || cartLoading}
-                className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-md text-xs sm:text-sm font-semibold border-2 transition-all duration-200 flex items-center justify-center space-x-2 ${
-                  product.availableStock === 0 || cartLoading
-                    ? "border-gray-200 text-gray-400 cursor-not-allowed"
-                    : "border-blue-200 text-blue-700 hover:border-blue-300 hover:bg-blue-50"
-                }`}
-              >
-                <Pill size={14} className="sm:w-4 sm:h-4" />
-                <span>{cartLoading ? "Adding..." : "Add Individual"}</span>
-                {!cartLoading && <span className="font-bold">Rs. {unitPrice}</span>}
-              </button>
-            )}
-          </div>
+          {/* Add to Cart Button */}
+          <button
+            onClick={() => handleAddToCart(product, "package")}
+            disabled={product.availableStock === 0 || cartLoading}
+            className={`w-full py-2.5 px-3 rounded-md text-xs font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+              product.availableStock === 0 || cartLoading
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "text-white shadow-sm hover:shadow-md cursor-pointer"
+            }`}
+            style={product.availableStock === 0 || cartLoading ? {} : {
+              backgroundColor: "#4A90E2",
+            }}
+            onMouseEnter={(e) => {
+              if (product.availableStock > 0 && !cartLoading) {
+                e.target.style.backgroundColor = "#3A7BC8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (product.availableStock > 0 && !cartLoading) {
+                e.target.style.backgroundColor = "#4A90E2";
+              }
+            }}
+          >
+            <ShoppingCart size={14} />
+            <span>
+              {cartLoading ? "Adding..." : "Add to Cart"}
+            </span>
+          </button>
         </div>
       </article>
     );
@@ -494,107 +474,66 @@ const ProductCatalog = () => {
       />
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
-          {/* Filters */}
-          <section
-            className="bg-white rounded-md sm:rounded-md shadow-sm border border-gray-100 mb-6 sm:mb-8 overflow-hidden"
-            aria-label="Product filters"
-            role="search"
-          >
-            {/* Filter Toggle - Always visible but styled for mobile-first */}
-            <button
-              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className="w-full flex items-center justify-between p-4 sm:p-6 bg-white hover:bg-gray-50 transition-colors lg:cursor-default border-b border-gray-100"
+          {/* Compact Filters Bar */}
+          {hasActiveFilters && (
+            <section
+              className="bg-white rounded-lg shadow-sm border border-gray-100 mb-6 p-4 overflow-hidden"
+              aria-label="Active filters"
             >
-              <div className="flex items-center space-x-3">
-                <Filter size={18} className="sm:w-5 sm:h-5 text-blue-600" />
-                <span className="font-semibold text-sm sm:text-base text-gray-900">
-                  Filter Products
-                </span>
-              </div>
-              <div className="lg:hidden">
-                {isFiltersOpen ? (
-                  <ChevronUp
-                    size={18}
-                    className="sm:w-5 sm:h-5 text-blue-600"
-                  />
-                ) : (
-                  <ChevronDown
-                    size={18}
-                    className="sm:w-5 sm:h-5 text-blue-600"
-                  />
-                )}
-              </div>
-            </button>
-
-            {/* Filter Content */}
-            <div
-              className={`${
-                isFiltersOpen ? "block" : "hidden"
-              } lg:block p-4 sm:p-6 border-t border-gray-100 lg:border-t-0`}
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                {/* Search */}
-                <div className="relative sm:col-span-2 lg:col-span-1">
-                  <Search
-                    size={16}
-                    className="sm:w-5 sm:h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search medicines..."
-                    value={filters.search}
-                    onChange={(e) =>
-                      handleFilterChange("search", e.target.value)
-                    }
-                    className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-                  />
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center space-x-2 flex-wrap">
+                  <span className="text-sm font-medium text-gray-600">Filters:</span>
+                  
+                  {/* Active Filter Pills */}
+                  {filters.search && (
+                    <div className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                      <Search size={12} className="mr-1" />
+                      <span>"{filters.search}"</span>
+                      <button
+                        onClick={() => handleFilterChange("search", "")}
+                        className="ml-2 hover:bg-blue-200 rounded-full p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {filters.category && (
+                    <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                      <span>{filters.category}</span>
+                      <button
+                        onClick={() => handleFilterChange("category", "")}
+                        className="ml-2 hover:bg-green-200 rounded-full p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {filters.medicineType && (
+                    <div className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                      <span>{filters.medicineType}</span>
+                      <button
+                        onClick={() => handleFilterChange("medicineType", "")}
+                        className="ml-2 hover:bg-purple-200 rounded-full p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                {/* Category Filter */}
-                <select
-                  value={filters.category}
-                  onChange={(e) =>
-                    handleFilterChange("category", e.target.value)
-                  }
-                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Medicine Type Filter */}
-                <select
-                  value={filters.medicineType}
-                  onChange={(e) =>
-                    handleFilterChange("medicineType", e.target.value)
-                  }
-                  className="w-full py-2.5 sm:py-3 px-3 sm:px-4 border border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 focus:bg-white transition-colors font-medium text-sm sm:text-base"
-                >
-                  <option value="">All Types</option>
-                  {medicineTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Clear Filters */}
+                
+                {/* Clear All Button */}
                 <button
-                  onClick={() => {
-                    clearFilters();
-                    setIsFiltersOpen(false);
-                  }}
-                  className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all font-semibold text-sm sm:text-base"
+                  onClick={clearFilters}
+                  className="text-sm text-gray-600 hover:text-red-600 font-medium"
                 >
-                  Clear Filters
+                  Clear All
                 </button>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
+
 
           {/* Results Header - Only show count when filters are active */}
           {hasActiveFilters && (
@@ -630,18 +569,18 @@ const ProductCatalog = () => {
 
           {/* Loading State */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {[...Array(8)].map((_, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+              {[...Array(10)].map((_, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 animate-pulse"
+                  className="bg-white rounded-lg shadow-sm p-3 animate-pulse"
                 >
-                  <div className="h-36 sm:h-48 bg-gray-200 rounded-lg sm:rounded-xl mb-4 sm:mb-5"></div>
-                  <div className="space-y-3">
-                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
-                    <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
+                  <div className="h-32 sm:h-40 bg-gray-200 rounded-md mb-3"></div>
+                  <div className="space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-6 bg-gray-200 rounded"></div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
                   </div>
                 </div>
               ))}
@@ -650,21 +589,18 @@ const ProductCatalog = () => {
             <>
               {/* Products Grid */}
               {products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
                   {products.map((product) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 sm:py-16 bg-white rounded-md sm:rounded-md shadow-md">
-                  <Package
-                    size={60}
-                    className="sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4"
-                  />
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                <div className="text-center py-8 sm:py-12 bg-white rounded-lg shadow-sm">
+                  <Package size={48} className="text-gray-300 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
                     No Products Found
                   </h3>
-                  <p className="text-sm sm:text-lg text-gray-600">
+                  <p className="text-sm text-gray-600">
                     Try adjusting your search criteria
                   </p>
                 </div>
@@ -672,11 +608,11 @@ const ProductCatalog = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center space-x-2 px-4">
+                <div className="flex items-center justify-center space-x-1 sm:space-x-2 px-4">
                   <button
                     onClick={() => handlePageChange(filters.page - 1)}
                     disabled={filters.page === 1}
-                    className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
+                    className="px-3 py-2 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
                   >
                     Previous
                   </button>
@@ -689,10 +625,10 @@ const ProductCatalog = () => {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all ${
+                        className={`px-2.5 sm:px-3 py-2 text-xs font-medium rounded-md transition-all ${
                           isCurrentPage
-                            ? "bg-blue-600 text-white shadow-md"
-                            : "text-gray-600 bg-white border-2 border-gray-200 hover:border-blue-200 hover:text-blue-600"
+                            ? "bg-blue-600 text-white"
+                            : "text-gray-600 bg-white border border-gray-200 hover:border-blue-200 hover:text-blue-600"
                         }`}
                       >
                         {page}
@@ -703,7 +639,7 @@ const ProductCatalog = () => {
                   <button
                     onClick={() => handlePageChange(filters.page + 1)}
                     disabled={filters.page === totalPages}
-                    className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
+                    className="px-3 py-2 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-200 hover:text-blue-600 transition-colors"
                   >
                     Next
                   </button>
