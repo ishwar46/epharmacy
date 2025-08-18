@@ -19,7 +19,7 @@ import {
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { getOrder } from "../services/orderService";
-import UpdateOrderModal from "../components/UpdateOrderModal.jsx";
+import UpdateOrderModal from "./UpdateOrderModal.jsx";
 import PrescriptionVerificationModal from "../components/PrescriptionVerificationModal";
 import OrderPackingModal from "../components/OrderPackingModal";
 import DispatchOrderModal from "../components/DispatchOrderModal";
@@ -154,7 +154,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               </button>
             </div>
             <div className="flex items-center gap-3">
-              {(order.hasPrescriptionItems || order.prescriptionStatus === 'pending_verification') && (
+              {(order.hasPrescriptionItems ||
+                order.prescriptionStatus === "pending_verification") && (
                 <button
                   onClick={() => setPrescriptionModalOpen(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
@@ -163,8 +164,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                   Verify Prescription
                 </button>
               )}
-              
-              {(order.status === 'confirmed' || order.status === 'prescription_verified') && (
+
+              {(order.status === "confirmed" ||
+                order.status === "prescription_verified") && (
                 <button
                   onClick={() => setPackingModalOpen(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
@@ -174,7 +176,7 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                 </button>
               )}
 
-              {order.status === 'packed' && (
+              {order.status === "packed" && (
                 <button
                   onClick={() => setDispatchModalOpen(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
@@ -183,7 +185,7 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                   Dispatch Order
                 </button>
               )}
-              
+
               <button
                 onClick={() => setUpdateModalOpen(true)}
                 disabled={order.status === "cancelled"}
@@ -238,22 +240,35 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               </div>
               <p className="text-sm text-gray-600 mb-1">
                 <span className="font-medium">Name:</span>{" "}
-                {displayValue(order.customer?.user?.name || order.customer?.guestDetails?.name)}
+                {displayValue(
+                  order.customer?.user?.name ||
+                    order.customer?.guestDetails?.name
+                )}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Email:</span>{" "}
-                {displayValue(order.customer?.user?.email || order.customer?.guestDetails?.email)}
+                {displayValue(
+                  order.customer?.user?.email ||
+                    order.customer?.guestDetails?.email
+                )}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Phone:</span>{" "}
-                {displayValue(order.customer?.user?.phone || order.customer?.guestDetails?.phone)}
+                {displayValue(
+                  order.customer?.user?.phone ||
+                    order.customer?.guestDetails?.phone
+                )}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Account Type:</span>{" "}
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  order.customer?.isGuest ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
-                }`}>
-                  {order.customer?.isGuest ? 'Guest' : 'Registered'}
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    order.customer?.isGuest
+                      ? "bg-orange-100 text-orange-800"
+                      : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {order.customer?.isGuest ? "Guest" : "Registered"}
                 </span>
               </p>
             </div>
@@ -293,13 +308,19 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Status:</span>{" "}
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  order.payment?.status === 'paid' ? 'bg-green-100 text-green-800' :
-                  order.payment?.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  order.payment?.status === 'failed' ? 'bg-red-100 text-red-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {order.payment?.status?.charAt(0).toUpperCase() + order.payment?.status?.slice(1) || 'N/A'}
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    order.payment?.status === "paid"
+                      ? "bg-green-100 text-green-800"
+                      : order.payment?.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : order.payment?.status === "failed"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {order.payment?.status?.charAt(0).toUpperCase() +
+                    order.payment?.status?.slice(1) || "N/A"}
                 </span>
               </p>
             </div>
@@ -319,7 +340,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               </p>
               <p className="text-sm text-gray-600 mb-1">
                 <span className="font-medium">Estimated Delivery:</span>{" "}
-                {order.delivery?.estimatedDeliveryTime ? formatDate(order.delivery.estimatedDeliveryTime) : 'TBD'}
+                {order.delivery?.estimatedDeliveryTime
+                  ? formatDate(order.delivery.estimatedDeliveryTime)
+                  : "TBD"}
               </p>
               {order.delivery?.actualDeliveryTime && (
                 <p className="text-sm text-gray-600">
@@ -426,29 +449,47 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
           >
             <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                order.prescriptionStatus === 'verified' ? 'bg-green-100' :
-                order.prescriptionStatus === 'pending_verification' ? 'bg-yellow-100' :
-                order.prescriptionStatus === 'rejected' ? 'bg-red-100' :
-                'bg-gray-100'
-              }`}>
-                <FaSignature className={`${
-                  order.prescriptionStatus === 'verified' ? 'text-green-600' :
-                  order.prescriptionStatus === 'pending_verification' ? 'text-yellow-600' :
-                  order.prescriptionStatus === 'rejected' ? 'text-red-600' :
-                  'text-gray-600'
-                } text-lg`} />
+              <div
+                className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  order.prescriptionStatus === "verified"
+                    ? "bg-green-100"
+                    : order.prescriptionStatus === "pending_verification"
+                    ? "bg-yellow-100"
+                    : order.prescriptionStatus === "rejected"
+                    ? "bg-red-100"
+                    : "bg-gray-100"
+                }`}
+              >
+                <FaSignature
+                  className={`${
+                    order.prescriptionStatus === "verified"
+                      ? "text-green-600"
+                      : order.prescriptionStatus === "pending_verification"
+                      ? "text-yellow-600"
+                      : order.prescriptionStatus === "rejected"
+                      ? "text-red-600"
+                      : "text-gray-600"
+                  } text-lg`}
+                />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Prescription Verification</h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Prescription Verification
+                </h3>
                 <p className="text-sm text-gray-500">
-                  Status: <span className={`font-medium ${
-                    order.prescriptionStatus === 'verified' ? 'text-green-600' :
-                    order.prescriptionStatus === 'pending_verification' ? 'text-yellow-600' :
-                    order.prescriptionStatus === 'rejected' ? 'text-red-600' :
-                    'text-gray-600'
-                  }`}>
-                    {order.prescriptionStatus?.replace('_', ' ').toUpperCase()}
+                  Status:{" "}
+                  <span
+                    className={`font-medium ${
+                      order.prescriptionStatus === "verified"
+                        ? "text-green-600"
+                        : order.prescriptionStatus === "pending_verification"
+                        ? "text-yellow-600"
+                        : order.prescriptionStatus === "rejected"
+                        ? "text-red-600"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {order.prescriptionStatus?.replace("_", " ").toUpperCase()}
                   </span>
                 </p>
               </div>
@@ -457,50 +498,70 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
             {order.prescriptions?.length > 0 ? (
               <div className="space-y-4">
                 {order.prescriptions.map((prescription, index) => (
-                  <div key={prescription._id || index} className="bg-gray-50 p-4 rounded-lg">
+                  <div
+                    key={prescription._id || index}
+                    className="bg-gray-50 p-4 rounded-lg"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <p className="text-sm text-gray-600 mb-1">
-                          <span className="font-medium">Doctor:</span> {prescription.doctorName}
+                          <span className="font-medium">Doctor:</span>{" "}
+                          {prescription.doctorName}
                         </p>
                         <p className="text-sm text-gray-600 mb-1">
-                          <span className="font-medium">Hospital:</span> {prescription.hospitalName || 'N/A'}
+                          <span className="font-medium">Hospital:</span>{" "}
+                          {prescription.hospitalName || "N/A"}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <span className="font-medium">Date:</span> {formatDate(prescription.prescriptionDate)}
+                          <span className="font-medium">Date:</span>{" "}
+                          {formatDate(prescription.prescriptionDate)}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600 mb-1">
                           <span className="font-medium">Verified:</span>
-                          <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                            prescription.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {prescription.verified ? 'Yes' : 'Pending'}
+                          <span
+                            className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                              prescription.verified
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {prescription.verified ? "Yes" : "Pending"}
                           </span>
                         </p>
                         {prescription.verifiedBy && (
                           <p className="text-sm text-gray-600 mb-1">
-                            <span className="font-medium">Verified By:</span> {prescription.verifiedBy}
+                            <span className="font-medium">Verified By:</span>{" "}
+                            {prescription.verifiedBy.name ||
+                              prescription.verifiedBy}
                           </p>
                         )}
                         {prescription.verifiedAt && (
                           <p className="text-sm text-gray-600">
-                            <span className="font-medium">Verified At:</span> {formatDate(prescription.verifiedAt)}
+                            <span className="font-medium">Verified At:</span>{" "}
+                            {formatDate(prescription.verifiedAt)}
                           </p>
                         )}
                       </div>
                     </div>
-                    
+
                     {/* Prescription Image */}
                     <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Prescription Document:</p>
+                      <p className="text-sm font-medium text-gray-700 mb-2">
+                        Prescription Document:
+                      </p>
                       <div className="flex items-center justify-center">
                         <img
                           src={`${API_BASE_URL}${prescription.imageUrl}`}
                           alt={`Prescription ${index + 1}`}
                           className="max-w-full max-h-96 object-contain rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
-                          onClick={() => window.open(`${API_BASE_URL}${prescription.imageUrl}`, '_blank')}
+                          onClick={() =>
+                            window.open(
+                              `${API_BASE_URL}${prescription.imageUrl}`,
+                              "_blank"
+                            )
+                          }
                         />
                       </div>
                       <p className="text-xs text-gray-500 mt-2 text-center">
@@ -511,7 +572,10 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                     {prescription.verificationNotes && (
                       <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <span className="font-medium">Verification Notes:</span> {prescription.verificationNotes}
+                          <span className="font-medium">
+                            Verification Notes:
+                          </span>{" "}
+                          {prescription.verificationNotes}
                         </p>
                       </div>
                     )}
@@ -519,7 +583,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                     {prescription.rejectionReason && (
                       <div className="mt-4 p-3 bg-red-50 rounded-lg">
                         <p className="text-sm text-red-800">
-                          <span className="font-medium">Rejection Reason:</span> {prescription.rejectionReason}
+                          <span className="font-medium">Rejection Reason:</span>{" "}
+                          {prescription.rejectionReason}
                         </p>
                       </div>
                     )}
@@ -569,7 +634,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                   )}
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900">
-                      {displayValue(item.productSnapshot?.name || item.product?.name)}
+                      {displayValue(
+                        item.productSnapshot?.name || item.product?.name
+                      )}
                     </h4>
                     <div className="flex items-center gap-4 mt-1">
                       {item.productSnapshot?.brand && (
@@ -590,10 +657,16 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                     </div>
                     <div className="flex items-center gap-4 mt-2 text-sm">
                       <span className="text-gray-600">
-                        Medicine Type: <span className="font-medium">{item.productSnapshot?.medicineType || 'N/A'}</span>
+                        Medicine Type:{" "}
+                        <span className="font-medium">
+                          {item.productSnapshot?.medicineType || "N/A"}
+                        </span>
                       </span>
                       <span className="text-gray-600">
-                        Product Type: <span className="font-medium">{item.productSnapshot?.productType || 'N/A'}</span>
+                        Product Type:{" "}
+                        <span className="font-medium">
+                          {item.productSnapshot?.productType || "N/A"}
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -631,27 +704,46 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                 <FaBoxOpen className="text-green-600" size={18} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Packing Details</h3>
-                <p className="text-sm text-gray-500">Order packing information</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Packing Details
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Order packing information
+                </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-green-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-green-800 mb-2">Packing Info</h4>
+                <h4 className="font-semibold text-green-800 mb-2">
+                  Packing Info
+                </h4>
                 <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">Packed At:</span> {formatDate(order.packingDetails.packedAt)}</p>
+                  <p>
+                    <span className="font-medium">Packed At:</span>{" "}
+                    {formatDate(order.packingDetails.packedAt)}
+                  </p>
                   {order.packingDetails.packageWeight && (
-                    <p><span className="font-medium">Weight:</span> {order.packingDetails.packageWeight}g</p>
+                    <p>
+                      <span className="font-medium">Weight:</span>{" "}
+                      {order.packingDetails.packageWeight}g
+                    </p>
                   )}
                   {order.packingDetails.packageDimensions && (
-                    <p><span className="font-medium">Dimensions:</span> {order.packingDetails.packageDimensions.length}×{order.packingDetails.packageDimensions.width}×{order.packingDetails.packageDimensions.height} cm</p>
+                    <p>
+                      <span className="font-medium">Dimensions:</span>{" "}
+                      {order.packingDetails.packageDimensions.length}×
+                      {order.packingDetails.packageDimensions.width}×
+                      {order.packingDetails.packageDimensions.height} cm
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="bg-green-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-green-800 mb-2">Special Handling</h4>
+                <h4 className="font-semibold text-green-800 mb-2">
+                  Special Handling
+                </h4>
                 <div className="space-y-2">
                   {order.packingDetails.fragileItems && (
                     <span className="inline-block px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
@@ -663,17 +755,25 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                       Cold Storage
                     </span>
                   )}
-                  {!order.packingDetails.fragileItems && !order.packingDetails.coldStorage && (
-                    <span className="text-sm text-gray-500">No special handling required</span>
-                  )}
+                  {!order.packingDetails.fragileItems &&
+                    !order.packingDetails.coldStorage && (
+                      <span className="text-sm text-gray-500">
+                        No special handling required
+                      </span>
+                    )}
                 </div>
               </div>
 
               <div className="bg-green-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-green-800 mb-2">Items Packed</h4>
+                <h4 className="font-semibold text-green-800 mb-2">
+                  Items Packed
+                </h4>
                 <div className="text-sm text-gray-700">
                   {order.packingDetails.packedItems ? (
-                    <span>{order.packingDetails.packedItems.length} items verified and packed</span>
+                    <span>
+                      {order.packingDetails.packedItems.length} items verified
+                      and packed
+                    </span>
                   ) : (
                     <span>All order items packed</span>
                   )}
@@ -684,7 +784,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
             {order.packingDetails.packingNotes && (
               <div className="mt-4 p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-800">
-                  <span className="font-medium">Packing Notes:</span> {order.packingDetails.packingNotes}
+                  <span className="font-medium">Packing Notes:</span>{" "}
+                  {order.packingDetails.packingNotes}
                 </p>
               </div>
             )}
@@ -692,7 +793,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
             {order.packingDetails.specialInstructions && (
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <span className="font-medium">Special Instructions:</span> {order.packingDetails.specialInstructions}
+                  <span className="font-medium">Special Instructions:</span>{" "}
+                  {order.packingDetails.specialInstructions}
                 </p>
               </div>
             )}
@@ -712,36 +814,60 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                 <FaTruck className="text-blue-600" size={18} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Dispatch Details</h3>
-                <p className="text-sm text-gray-500">Order dispatch information</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Dispatch Details
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Order dispatch information
+                </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium mb-1">Delivery Person</p>
-                <p className="font-semibold text-gray-900">{order.dispatchDetails.deliveryPersonName}</p>
-                <p className="text-sm text-gray-600">{order.dispatchDetails.deliveryPersonPhone}</p>
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Delivery Person
+                </p>
+                <p className="font-semibold text-gray-900">
+                  {order.dispatchDetails.deliveryPersonName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {order.dispatchDetails.deliveryPersonPhone}
+                </p>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium mb-1">Vehicle</p>
-                <p className="font-semibold text-gray-900">{order.dispatchDetails.vehicleNumber || 'N/A'}</p>
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Vehicle
+                </p>
+                <p className="font-semibold text-gray-900">
+                  {order.dispatchDetails.vehicleNumber || "N/A"}
+                </p>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium mb-1">Tracking Number</p>
-                <p className="font-mono font-semibold text-gray-900">{order.dispatchDetails.trackingNumber}</p>
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Tracking Number
+                </p>
+                <p className="font-mono font-semibold text-gray-900">
+                  {order.dispatchDetails.trackingNumber}
+                </p>
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium mb-1">Priority</p>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  order.dispatchDetails.priorityDelivery 
-                    ? 'bg-red-100 text-red-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {order.dispatchDetails.priorityDelivery ? 'High Priority' : 'Standard'}
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Priority
+                </p>
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    order.dispatchDetails.priorityDelivery
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {order.dispatchDetails.priorityDelivery
+                    ? "High Priority"
+                    : "Standard"}
                 </span>
               </div>
             </div>
@@ -750,9 +876,15 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-blue-800 mb-2">Timeline</h4>
                 <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">Dispatched At:</span> {formatDate(order.dispatchDetails.dispatchedAt)}</p>
+                  <p>
+                    <span className="font-medium">Dispatched At:</span>{" "}
+                    {formatDate(order.dispatchDetails.dispatchedAt)}
+                  </p>
                   {order.dispatchDetails.estimatedDeliveryTime && (
-                    <p><span className="font-medium">Est. Delivery:</span> {formatDate(order.dispatchDetails.estimatedDeliveryTime)}</p>
+                    <p>
+                      <span className="font-medium">Est. Delivery:</span>{" "}
+                      {formatDate(order.dispatchDetails.estimatedDeliveryTime)}
+                    </p>
                   )}
                 </div>
               </div>
@@ -760,7 +892,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-blue-800 mb-2">Route Info</h4>
                 <p className="text-sm text-gray-700">
-                  {order.dispatchDetails.routeInstructions || 'No specific route instructions'}
+                  {order.dispatchDetails.routeInstructions ||
+                    "No specific route instructions"}
                 </p>
               </div>
             </div>
@@ -768,7 +901,8 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
             {order.dispatchDetails.dispatchNotes && (
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <span className="font-medium">Dispatch Notes:</span> {order.dispatchDetails.dispatchNotes}
+                  <span className="font-medium">Dispatch Notes:</span>{" "}
+                  {order.dispatchDetails.dispatchNotes}
                 </p>
               </div>
             )}
@@ -859,14 +993,16 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                   </p>
                 </div>
               </div>
-              
+
               <div>
-                <span className="font-medium text-gray-600">Street Address:</span>
+                <span className="font-medium text-gray-600">
+                  Street Address:
+                </span>
                 <p className="text-gray-800">
                   {displayValue(order.deliveryAddress?.street)}
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                 <div>
                   <span className="font-medium text-gray-600">Area:</span>
@@ -887,10 +1023,12 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
                   </p>
                 </div>
               </div>
-              
+
               {order.deliveryAddress?.deliveryInstructions && (
                 <div>
-                  <span className="font-medium text-gray-600">Delivery Instructions:</span>
+                  <span className="font-medium text-gray-600">
+                    Delivery Instructions:
+                  </span>
                   <p className="text-gray-800 bg-blue-50 p-2 rounded text-sm mt-1">
                     {order.deliveryAddress.deliveryInstructions}
                   </p>
@@ -899,7 +1037,9 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
 
               {order.notes?.customerNotes && (
                 <div>
-                  <span className="font-medium text-gray-600">Customer Notes:</span>
+                  <span className="font-medium text-gray-600">
+                    Customer Notes:
+                  </span>
                   <p className="text-gray-800 bg-yellow-50 p-2 rounded text-sm mt-1">
                     {order.notes.customerNotes}
                   </p>

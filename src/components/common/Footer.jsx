@@ -367,7 +367,7 @@ const Footer = () => {
           <div className="flex flex-col space-y-3 sm:space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div className="text-center lg:text-left order-2 lg:order-1">
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                © 2024 FixPharmacy. All rights reserved.
+                © 2025 FixPharmacy. All rights reserved.
                 <br className="sm:hidden" />
                 <span className="hidden sm:inline"> | </span>Licensed Pharmacy
                 in Nepal

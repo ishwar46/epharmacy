@@ -82,7 +82,7 @@ export const cancelOrder = async (orderId, reason) => {
 // Track order by order number (public)
 export const trackOrder = async (orderNumber, phone = null) => {
     try {
-        const url = phone 
+        const url = phone
             ? `${CUSTOMER_API_URL}/track/${orderNumber}?phone=${encodeURIComponent(phone)}`
             : `${CUSTOMER_API_URL}/track/${orderNumber}`;
         const response = await axios.get(url);
@@ -113,7 +113,7 @@ export const getOrder = async (orderId) => {
 export const updateOrder = async (orderId, data) => {
     // Check if we have file uploads (customerSignature)
     const hasFileUpload = data.customerSignature instanceof File;
-    
+
     if (hasFileUpload) {
         // Use FormData for file uploads
         const formData = new FormData();
@@ -153,7 +153,7 @@ export default {
     getOrderById,
     cancelOrder,
     trackOrder,
-    
+
     // Admin functions
     getOrders,
     getOrder,
