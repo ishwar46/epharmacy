@@ -8,14 +8,15 @@ import { toNepalDateString } from "../utils/dateUtils";
 const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
   const [formData, setFormData] = useState({
     status: order ? order.status : "",
-    paymentStatus: order ? order.paymentStatus : "",
-    amountPaid: order ? order.finalPrice : 0,
-    paymentDate: order?.paymentDate
-      ? toNepalDateString(order.paymentDate)
+    paymentStatus: order ? order.payment?.status : "",
+    amountPaid: order ? order.pricing?.total : 0,
+    paymentDate: order?.payment?.paidAt
+      ? toNepalDateString(order.payment.paidAt)
       : toNepalDateString(new Date()),
-    deliveryPersonName: order?.deliveryPersonName || "",
-    deliveryPersonContact: order?.deliveryPersonContact || "",
-    estimatedArrivalTime: order?.estimatedArrivalTime || "",
+    deliveryPersonName: order?.delivery?.assignedTo?.name || "",
+    deliveryPersonContact: order?.delivery?.assignedTo?.phone || "",
+    estimatedArrivalTime: order?.delivery?.estimatedDeliveryTime
+      ? toNepalDateString(order.delivery.estimatedDeliveryTime) : "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,14 +25,15 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
     if (order) {
       setFormData({
         status: order.status,
-        paymentStatus: order.paymentStatus,
-        amountPaid: order.finalPrice,
-        paymentDate: order.paymentDate
-          ? toNepalDateString(order.paymentDate)
+        paymentStatus: order.payment?.status,
+        amountPaid: order.pricing?.total,
+        paymentDate: order.payment?.paidAt
+          ? toNepalDateString(order.payment.paidAt)
           : toNepalDateString(new Date()),
-        deliveryPersonName: order.deliveryPersonName || "",
-        deliveryPersonContact: order.deliveryPersonContact || "",
-        estimatedArrivalTime: order.estimatedArrivalTime || "",
+        deliveryPersonName: order.delivery?.assignedTo?.name || "",
+        deliveryPersonContact: order.delivery?.assignedTo?.phone || "",
+        estimatedArrivalTime: order.delivery?.estimatedDeliveryTime
+          ? toNepalDateString(order.delivery.estimatedDeliveryTime) : "",
       });
     }
   }, [order]);
@@ -99,7 +101,7 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
             </label>
             <input
               type="text"
-              value={order.user.name}
+              value={order.customer?.user?.name || order.customer?.guestDetails?.name || 'N/A'}
               readOnly
               className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
             />
@@ -108,7 +110,7 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
             <label className="block text-gray-700 text-sm">Total Price:</label>
             <input
               type="number"
-              value={order.finalPrice}
+              value={order.pricing?.total || 0}
               readOnly
               className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
             />
@@ -128,7 +130,9 @@ const UpdateOrderModal = ({ open, order, handleClose, onOrderUpdated }) => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
               >
                 <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
+                <option value="prescription_verified">Prescription Verified</option>
+                <option value="packed">Packed</option>
+                <option value="returned">Returned</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="shipped">Shipped</option>
                 <option value="out for delivery">Out for Delivery</option>

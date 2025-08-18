@@ -320,9 +320,9 @@ const OrderTracking = () => {
                       {getDeliveryStatus()}
                     </div>
                     
-                    {order.estimatedDeliveryTime && order.status !== 'delivered' && (
+                    {(order.dispatchDetails?.estimatedDeliveryTime || order.estimatedDeliveryTime) && order.status !== 'delivered' && (
                       <p className="text-sm text-gray-600 mt-1">
-                        Expected: {new Date(order.estimatedDeliveryTime).toLocaleDateString()}
+                        Expected: {new Date(order.dispatchDetails?.estimatedDeliveryTime || order.estimatedDeliveryTime).toLocaleDateString()}
                       </p>
                     )}
                   </div>
@@ -374,6 +374,112 @@ const OrderTracking = () => {
                   )}
                 </div>
               </div>
+
+              {/* Dispatch Details */}
+              {order.dispatchDetails && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                    <Truck className="w-5 h-5 mr-2 text-blue-600" />
+                    Delivery Information
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">Delivery Person</p>
+                        <div className="flex items-center space-x-2">
+                          <User className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-900">{order.dispatchDetails.deliveryPersonName}</span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">Contact Number</p>
+                        <div className="flex items-center space-x-2">
+                          <Phone className="w-4 h-4 text-gray-400" />
+                          <a 
+                            href={`tel:${order.dispatchDetails.deliveryPersonPhone}`}
+                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            {order.dispatchDetails.deliveryPersonPhone}
+                          </a>
+                        </div>
+                      </div>
+
+                      {order.dispatchDetails.vehicleNumber && (
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-1">Vehicle Number</p>
+                          <div className="flex items-center space-x-2">
+                            <Truck className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-900 font-mono">{order.dispatchDetails.vehicleNumber}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">Tracking Number</p>
+                        <div className="flex items-center space-x-2">
+                          <Hash className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-900 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                            {order.dispatchDetails.trackingNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-1">Dispatched At</p>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-900">
+                            {new Date(order.dispatchDetails.dispatchedAt).toLocaleString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {order.dispatchDetails.estimatedDeliveryTime && (
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-1">Estimated Delivery</p>
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-900 font-medium">
+                              {new Date(order.dispatchDetails.estimatedDeliveryTime).toLocaleString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {order.dispatchDetails.priorityDelivery && (
+                        <div>
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <ExternalLink className="w-3 h-3 mr-1" />
+                            Priority Delivery
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {order.dispatchDetails.routeInstructions && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-medium">Route Instructions:</span> {order.dispatchDetails.routeInstructions}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Order Timeline */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">

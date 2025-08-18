@@ -1,12 +1,13 @@
-// Order status options
+// Order status options - Updated to match backend Order model
 export const ORDER_STATUS = [
     "pending",
-    "processing",
+    "prescription_verified",
     "confirmed",
-    "shipped",
-    "out for delivery",
+    "packed",
+    "out_for_delivery",
     "delivered",
-    "cancelled"
+    "cancelled",
+    "returned"
 ];
 
 // Payment method options

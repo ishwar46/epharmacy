@@ -10,12 +10,14 @@ import {
   FaShoppingCart,
   FaSearch,
   FaFilter,
+  FaPrescriptionBottleAlt,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import Pagination from "../components/Paginations";
 import Lottie from "react-lottie";
 import noDataAnimation from "../assets/animations/nodata.json";
 import { formatDate } from "../utils/dateUtils";
-import { getStatusColor } from "../utils/statusUtils";
+import { getStatusColor, getStatusLabel } from "../utils/statusUtils";
 import Loading from "../components/Loading";
 import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
@@ -30,6 +32,7 @@ const AdminOrders = ({ onOrderSelect }) => {
   // Filter/search states
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [prescriptionFilter, setPrescriptionFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
 
   // Pagination state
@@ -69,10 +72,10 @@ const AdminOrders = ({ onOrderSelect }) => {
 
   // Filters
   const filteredOrders = orders.filter((order) => {
-    // Safe search with null checks
+    // Safe search with null checks - Fixed data structure
     const orderNumber = order.orderNumber || order._id || "";
-    const customerName = order.user?.name || "";
-    const customerEmail = order.user?.email || "";
+    const customerName = order.customer?.user?.name || order.customer?.guestDetails?.name || "";
+    const customerEmail = order.customer?.user?.email || order.customer?.guestDetails?.email || "";
 
     const matchesSearch =
       orderNumber
@@ -84,7 +87,15 @@ const AdminOrders = ({ onOrderSelect }) => {
 
     const matchesStatus =
       statusFilter === "All" || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+      
+    const matchesPrescription =
+      prescriptionFilter === "All" ||
+      (prescriptionFilter === "Required" && (order.hasPrescriptionItems || order.prescriptionStatus === 'pending_verification')) ||
+      (prescriptionFilter === "Pending" && order.prescriptionStatus === 'pending_verification') ||
+      (prescriptionFilter === "Verified" && order.prescriptionStatus === 'verified') ||
+      (prescriptionFilter === "OTC" && !order.hasPrescriptionItems && order.prescriptionStatus === 'not_required');
+      
+    return matchesSearch && matchesStatus && matchesPrescription;
   });
 
   // Pagination
@@ -98,8 +109,11 @@ const AdminOrders = ({ onOrderSelect }) => {
   const deliveredOrders = orders.filter(
     (order) => order.status === "delivered"
   ).length;
+  const prescriptionOrders = orders.filter(
+    (order) => order.hasPrescriptionItems || order.prescriptionStatus === "pending_verification"
+  ).length;
   const totalRevenue = orders.reduce(
-    (acc, order) => acc + (order.finalPrice || order.totalPrice || 0),
+    (acc, order) => acc + (order.pricing?.total || 0),
     0
   );
 
@@ -162,7 +176,7 @@ const AdminOrders = ({ onOrderSelect }) => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Total Orders */}
           <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -208,6 +222,23 @@ const AdminOrders = ({ onOrderSelect }) => {
               </div>
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                 <FaCheckCircle className="text-green-500" size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Prescription Orders */}
+          <div className="bg-white rounded-sm p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  RX Required
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {prescriptionOrders}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                <FaPrescriptionBottleAlt className="text-red-500" size={20} />
               </div>
             </div>
           </div>
@@ -269,9 +300,12 @@ const AdminOrders = ({ onOrderSelect }) => {
                   <FaFilter size={14} />
                   Filters
                 </button>
-                {statusFilter !== "All" && (
+                {(statusFilter !== "All" || prescriptionFilter !== "All") && (
                   <button
-                    onClick={() => setStatusFilter("All")}
+                    onClick={() => {
+                      setStatusFilter("All");
+                      setPrescriptionFilter("All");
+                    }}
                     className="text-xs text-blue-500"
                   >
                     Clear
@@ -293,9 +327,21 @@ const AdminOrders = ({ onOrderSelect }) => {
                   <option value="All">All Status</option>
                   {ORDER_STATUS.map((status) => (
                     <option key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      {getStatusLabel(status)}
                     </option>
                   ))}
+                </select>
+                
+                <select
+                  value={prescriptionFilter}
+                  onChange={(e) => setPrescriptionFilter(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                >
+                  <option value="All">All Types</option>
+                  <option value="Required">RX Required</option>
+                  <option value="Pending">Pending Verification</option>
+                  <option value="Verified">RX Verified</option>
+                  <option value="OTC">OTC Only</option>
                 </select>
               </div>
             </div>
@@ -315,6 +361,9 @@ const AdminOrders = ({ onOrderSelect }) => {
                         </th>
                         <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
                           Order
+                        </th>
+                        <th className="text-center py-3 px-2 text-sm font-medium text-gray-500">
+                          Type
                         </th>
                         <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">
                           Customer
@@ -346,13 +395,39 @@ const AdminOrders = ({ onOrderSelect }) => {
                               </p>
                             </div>
                           </td>
+                          <td className="py-4 px-2 text-center">
+                            <div className="flex items-center justify-center">
+                              {order.hasPrescriptionItems || order.prescriptionStatus === 'pending_verification' ? (
+                                <div className="relative group">
+                                  <FaPrescriptionBottleAlt 
+                                    className={`text-lg ${
+                                      order.prescriptionStatus === 'pending_verification' 
+                                        ? 'text-red-500' 
+                                        : order.prescriptionStatus === 'verified'
+                                        ? 'text-green-500'
+                                        : 'text-yellow-500'
+                                    }`} 
+                                  />
+                                  <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    {order.prescriptionStatus === 'pending_verification' 
+                                      ? 'Prescription Pending' 
+                                      : order.prescriptionStatus === 'verified'
+                                      ? 'Prescription Verified'
+                                      : 'Prescription Required'}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-sm">OTC</span>
+                              )}
+                            </div>
+                          </td>
                           <td className="py-4 px-2">
                             <div>
                               <p className="font-medium text-gray-900">
-                                {order.user?.name || "N/A"}
+                                {order.customer?.user?.name || order.customer?.guestDetails?.name || "N/A"}
                               </p>
                               <p className="text-sm text-gray-500">
-                                {order.user?.email || "N/A"}
+                                {order.customer?.user?.email || order.customer?.guestDetails?.email || "N/A"}
                               </p>
                             </div>
                           </td>
@@ -362,19 +437,11 @@ const AdminOrders = ({ onOrderSelect }) => {
                                 order.status
                               )}`}
                             >
-                              {order.status
-                                ? order.status.charAt(0).toUpperCase() +
-                                  order.status.slice(1)
-                                : "Unknown"}
+                              {getStatusLabel(order.status)}
                             </span>
                           </td>
                           <td className="py-4 px-2 text-right font-medium text-gray-900">
-                            Rs.{" "}
-                            {(
-                              order.finalPrice ||
-                              order.totalPrice ||
-                              0
-                            ).toLocaleString()}
+                            Rs. {(order.pricing?.total || 0).toLocaleString()}
                           </td>
                           <td className="py-4 px-2 text-sm text-gray-600">
                             {formatDate(order.createdAt)}
@@ -401,14 +468,29 @@ const AdminOrders = ({ onOrderSelect }) => {
                     <div key={order._id} className="bg-gray-50 rounded-xl p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-900 truncate">
-                            {order.orderNumber || `#${order._id.slice(-6)}`}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-gray-900 truncate">
+                              {order.orderNumber || `#${order._id.slice(-6)}`}
+                            </h3>
+                            {order.hasPrescriptionItems || order.prescriptionStatus === 'pending_verification' ? (
+                              <FaPrescriptionBottleAlt 
+                                className={`text-sm ${
+                                  order.prescriptionStatus === 'pending_verification' 
+                                    ? 'text-red-500' 
+                                    : order.prescriptionStatus === 'verified'
+                                    ? 'text-green-500'
+                                    : 'text-yellow-500'
+                                }`} 
+                              />
+                            ) : (
+                              <span className="text-xs text-gray-400 bg-gray-200 px-1 rounded">OTC</span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-500 mt-1">
-                            {order.user?.name || "N/A"}
+                            {order.customer?.user?.name || order.customer?.guestDetails?.name || "N/A"}
                           </p>
                           <p className="text-xs text-gray-400">
-                            {order.user?.email || "N/A"}
+                            {order.customer?.user?.email || order.customer?.guestDetails?.email || "N/A"}
                           </p>
                         </div>
                         <span
@@ -416,10 +498,7 @@ const AdminOrders = ({ onOrderSelect }) => {
                             order.status
                           )}`}
                         >
-                          {order.status
-                            ? order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)
-                            : "Unknown"}
+                          {getStatusLabel(order.status)}
                         </span>
                       </div>
 
@@ -427,12 +506,7 @@ const AdminOrders = ({ onOrderSelect }) => {
                         <div className="flex items-center gap-4 text-sm">
                           <span className="text-gray-500">Amount:</span>
                           <span className="font-medium text-gray-900">
-                            Rs.{" "}
-                            {(
-                              order.finalPrice ||
-                              order.totalPrice ||
-                              0
-                            ).toLocaleString()}
+                            Rs. {(order.pricing?.total || 0).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">

@@ -111,28 +111,39 @@ export const getOrder = async (orderId) => {
 
 // Update an order (Admin View)
 export const updateOrder = async (orderId, data) => {
-    // 1. Create a FormData object
-    const formData = new FormData();
+    // Check if we have file uploads (customerSignature)
+    const hasFileUpload = data.customerSignature instanceof File;
+    
+    if (hasFileUpload) {
+        // Use FormData for file uploads
+        const formData = new FormData();
 
-    // 2. Loop through the data object, appending fields to formData
-    //    If data.customerSignature is a File, it will be appended properly.
-    Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value);
-    });
+        // Handle complex objects properly
+        Object.entries(data).forEach(([key, value]) => {
+            if (typeof value === 'object' && !(value instanceof File)) {
+                // Convert complex objects to JSON strings
+                formData.append(key, JSON.stringify(value));
+            } else {
+                formData.append(key, value);
+            }
+        });
 
-    // 3. Add your auth headers, but let axios set the correct
-    //    Content-Type for multipart/form-data automatically.
-    const config = {
-        ...getAuthHeaders(), // merges your existing auth headers
-        headers: {
-            ...getAuthHeaders().headers,
-            "Content-Type": "multipart/form-data",
-        },
-    };
+        // Use FormData config
+        const config = {
+            ...getAuthHeaders(),
+            headers: {
+                ...getAuthHeaders().headers,
+                "Content-Type": "multipart/form-data",
+            },
+        };
 
-    // 4. Send formData instead of data
-    const response = await axios.put(`${ADMIN_API_URL}/${orderId}`, formData, config);
-    return response.data;
+        const response = await axios.put(`${ADMIN_API_URL}/${orderId}`, formData, config);
+        return response.data;
+    } else {
+        // Use regular JSON for non-file requests (like prescription verification)
+        const response = await axios.put(`${ADMIN_API_URL}/${orderId}`, data, getAuthHeaders());
+        return response.data;
+    }
 };
 
 export default {

@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, Shield, Truck, Clock } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight,
+  Shield,
+  Truck,
+  Clock,
+} from "lucide-react";
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -9,50 +16,56 @@ const HeroBanner = () => {
       id: 1,
       title: "Authentic Medicines",
       subtitle: "Licensed & Trusted",
-      description: "Get 100% authentic medicines delivered to your doorstep with our licensed pharmacy in Biratnagar, Nepal.",
-      image: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      description:
+        "Get 100% authentic medicines delivered to your doorstep with our licensed pharmacy in Biratnagar, Nepal.",
+      image:
+        "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       ctaText: "Shop Now",
       ctaLink: "#products",
-      bgGradient: "from-blue-600 to-blue-800"
+      bgGradient: "from-blue-600 to-blue-800",
     },
     {
       id: 2,
       title: "Fast Delivery",
       subtitle: "24/7 Service",
-      description: "Quick and reliable medicine delivery across Biratnagar. Emergency medicines available round the clock.",
-      image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      description:
+        "Quick and reliable medicine delivery across Biratnagar. Emergency medicines available round the clock.",
+      image:
+        "https://plus.unsplash.com/premium_vector-1723106617732-1b7c98fd6b25?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       ctaText: "Order Now",
       ctaLink: "#products",
-      bgGradient: "from-green-600 to-green-800"
+      bgGradient: "from-green-600 to-green-800",
     },
     {
       id: 3,
       title: "Prescription Care",
       subtitle: "Expert Guidance",
-      description: "Upload your prescription and get expert consultation. Safe, secure, and confidential medicine ordering.",
-      image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      description:
+        "Upload your prescription and get expert consultation. Safe, secure, and confidential medicine ordering.",
+      image:
+        "https://plus.unsplash.com/premium_vector-1682269321090-17424d99942d?q=80&w=1220&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       ctaText: "Upload Prescription",
       ctaLink: "/prescriptions",
-      bgGradient: "from-purple-600 to-purple-800"
-    }
+      bgGradient: "from-purple-600 to-purple-800",
+    },
   ];
 
   const features = [
     {
       icon: Shield,
       title: "100% Authentic",
-      description: "Licensed pharmacy with genuine medicines"
+      description: "Licensed pharmacy with genuine medicines",
     },
     {
       icon: Truck,
       title: "Fast Delivery",
-      description: "Quick delivery across Biratnagar"
+      description: "Quick delivery across Biratnagar",
     },
     {
       icon: Clock,
       title: "24/7 Support",
-      description: "Round the clock customer service"
-    }
+      description: "Round the clock customer service",
+    },
   ];
 
   useEffect(() => {
@@ -78,7 +91,7 @@ const HeroBanner = () => {
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+              index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
             {/* Background Image */}
@@ -88,7 +101,9 @@ const HeroBanner = () => {
                 alt={slide.title}
                 className="w-full h-full object-cover"
               />
-              <div className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-80`}></div>
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-80`}
+              ></div>
             </div>
 
             {/* Content */}
@@ -146,7 +161,7 @@ const HeroBanner = () => {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentSlide ? 'bg-white' : 'bg-white/50'
+                index === currentSlide ? "bg-white" : "bg-white/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
