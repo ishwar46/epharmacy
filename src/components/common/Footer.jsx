@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Phone,
   Mail,
@@ -21,6 +21,17 @@ import {
 import { scrollToTop } from "../../utils/scrollUtils";
 
 const Footer = () => {
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollButton(window.scrollY > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Main Footer Content */}
@@ -394,13 +405,15 @@ const Footer = () => {
       </div>
 
       {/* Enhanced Scroll to Top Button - Mobile Optimized */}
-      <button
-        onClick={() => scrollToTop()}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 p-2.5 sm:p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 touch-manipulation"
-        aria-label="Scroll to top"
-      >
-        <ChevronUp size={18} className="sm:w-5 sm:h-5" />
-      </button>
+      {showScrollButton && (
+        <button
+          onClick={() => scrollToTop()}
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 p-2.5 sm:p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 touch-manipulation"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp size={18} className="sm:w-5 sm:h-5" />
+        </button>
+      )}
     </footer>
   );
 };

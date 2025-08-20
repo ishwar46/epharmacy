@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { scrollToTop } from "../../utils/scrollUtils";
 import { useScrollPosition } from "../../hooks/useScrollPosition";
 import { useSearch } from "../../contexts/SearchContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -24,7 +23,6 @@ import {
   LogOut,
   Settings,
   History,
-  ChevronUp,
 } from "lucide-react";
 
 const StickyNavbar = () => {
@@ -39,30 +37,53 @@ const StickyNavbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
-  // Smart scroll behavior with throttling to prevent flickering
-  const scrollPosition = useScrollPosition(50); // 50ms throttle for smooth performance
+  // Clean scroll behavior with simple state management
+  const scrollPosition = useScrollPosition(150);
   const [isVisible, setIsVisible] = useState(true);
   const [isCompact, setIsCompact] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [prevScrollY, setPrevScrollY] = useState(0);
+  const [hideTimeout, setHideTimeout] = useState(null);
 
-  // Smart navbar visibility logic with throttled scroll position
+  // Redesigned scroll logic - clean and predictable
   useEffect(() => {
-    const currentScrollY = scrollPosition;
-
-    // Show/hide logic based on scroll direction
-    if (currentScrollY < lastScrollY || currentScrollY < 100) {
+    const currentY = scrollPosition;
+    const scrollDelta = currentY - prevScrollY;
+    const isScrollingDown = scrollDelta > 0;
+    const isScrollingUp = scrollDelta < 0;
+    
+    // Clear any existing timeout
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      setHideTimeout(null);
+    }
+    
+    // Simple visibility rules
+    if (currentY <= 100) {
+      // Always show at top
       setIsVisible(true);
-    } else if (currentScrollY > lastScrollY && currentScrollY > 200) {
-      setIsVisible(false);
-      setIsMenuOpen(false);
-      setIsSearchOpen(false);
-      setIsUserMenuOpen(false);
+    } else if (isScrollingUp && Math.abs(scrollDelta) > 30) {
+      // Show immediately on upward scroll
+      setIsVisible(true);
+    } else if (isScrollingDown && Math.abs(scrollDelta) > 80 && currentY > 300) {
+      // Hide with delay on significant downward scroll
+      const timeout = setTimeout(() => {
+        setIsVisible(false);
+        setIsMenuOpen(false);
+        setIsSearchOpen(false);
+        setIsUserMenuOpen(false);
+      }, 300); // 300ms delay before hiding
+      setHideTimeout(timeout);
     }
 
-    // Compact mode after scrolling past header
-    setIsCompact(currentScrollY > 150);
-    setLastScrollY(currentScrollY);
-  }, [scrollPosition, lastScrollY]);
+    // Update compact state
+    setIsCompact(currentY > 120);
+    setPrevScrollY(currentY);
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (hideTimeout) clearTimeout(hideTimeout);
+    };
+  }, [scrollPosition, prevScrollY, hideTimeout]);
 
   // Sync local search query with global search context
   useEffect(() => {
@@ -772,16 +793,6 @@ const StickyNavbar = () => {
         )}
       </div>
 
-      {/* Scroll to top button - Show when navbar is hidden */}
-      {!isVisible && scrollPosition > 400 && (
-        <button
-          onClick={() => scrollToTop()}
-          className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110"
-          aria-label="Scroll to top"
-        >
-          <ChevronUp size={20} />
-        </button>
-      )}
 
       {/* Backdrop for mobile overlays - Modern blur effect */}
       {(isMenuOpen || isSearchOpen) && (
