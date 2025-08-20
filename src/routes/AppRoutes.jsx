@@ -11,6 +11,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import NotFound from "../pages/NotFound";
 import ProductsDashboard from "../pages/ProductsDashboard";
 import UsersDashboard from "../pages/UsersDashboard";
+import HeroBannerDashboard from "../pages/HeroBannerDashboard";
 import ProductCatalog from "../pages/customer/ProductCatalog";
 import ProductDetail from "../pages/customer/ProductDetail";
 import LandingPage from "../pages/LandingPage";
@@ -75,6 +76,7 @@ const AppRoutes = () => {
         <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
         <Route path="/admin/products" element={<ProductsDashboard />} />
         <Route path="/admin/users" element={<UsersDashboard />} />
+        <Route path="/admin/hero-banner" element={<HeroBannerDashboard />} />
       </Route>
     </Routes>
     </>

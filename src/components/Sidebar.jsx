@@ -6,6 +6,7 @@ import {
   FaBox,
   FaBars,
   FaTimes,
+  FaImage,
 } from "react-icons/fa";
 import { FaCartFlatbed } from "react-icons/fa6";
 
@@ -37,6 +38,7 @@ const Sidebar = ({
     { label: "Products", icon: <FaBox />, key: "products" },
     { label: "Users", icon: <FaUsers />, key: "users" },
     { label: "Orders", icon: <FaCartFlatbed />, key: "orders" },
+    { label: "Hero Banner", icon: <FaImage />, key: "hero-banner" },
   ];
 
   const handleMenuItemClick = (key) => {

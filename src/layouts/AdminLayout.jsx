@@ -20,6 +20,7 @@ const AdminLayout = () => {
     if (path === '/admin/products') return 'products';
     if (path === '/admin/users') return 'users';
     if (path === '/admin/orders') return 'orders';
+    if (path === '/admin/hero-banner') return 'hero-banner';
     if (path.startsWith('/admin/orders/')) return 'orderDetails';
     return 'dashboard';
   };
@@ -34,6 +35,7 @@ const AdminLayout = () => {
            selectedPage === "users" ? "Users Management" : 
            selectedPage === "orders" ? "Orders Management" : 
            selectedPage === "orderDetails" ? "Order Details" : 
+           selectedPage === "hero-banner" ? "Hero Banner Management" : 
            selectedPage === "dashboard" ? "Dashboard" : ""
   });
 
@@ -84,7 +86,8 @@ const AdminLayout = () => {
       dashboard: '/admin/dashboard',
       products: '/admin/products',
       users: '/admin/users',
-      orders: '/admin/orders'
+      orders: '/admin/orders',
+      'hero-banner': '/admin/hero-banner'
     };
     
     if (routeMap[page]) {
