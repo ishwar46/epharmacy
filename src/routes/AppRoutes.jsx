@@ -24,61 +24,75 @@ import MainLayout from "../layouts/MainLayout";
 import PlainLayout from "../layouts/PlainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import ScrollToTop from "../components/common/ScrollToTop";
+import PromoBannerDashboard from "../pages/PromoBannerDashboard";
 
 const AppRoutes = () => {
   return (
     <>
       <ScrollToTop />
       <Routes>
-      {/* Public routes with navbar */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/products" element={<ProductCatalog />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
-        <Route path="/track" element={<OrderTracking />} />
-        <Route path="/track/:orderNumber" element={<OrderTracking />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+        {/* Public routes with navbar */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/products" element={<ProductCatalog />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/order-confirmation/:orderNumber"
+            element={<OrderConfirmation />}
+          />
+          <Route path="/track" element={<OrderTracking />} />
+          <Route path="/track/:orderNumber" element={<OrderTracking />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
 
-      {/* Auth routes (no navbar) */}
-      <Route element={<PlainLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>
+        {/* Auth routes (no navbar) */}
+        <Route element={<PlainLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
 
-      {/* Protected user routes (with navbar) */}
-      <Route element={<MainLayout />}>
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <UserProfile />
-          </ProtectedRoute>
-        } />
-        <Route path="/orders" element={
-          <ProtectedRoute>
-            <OrderHistory />
-          </ProtectedRoute>
-        } />
-      </Route>
+        {/* Protected user routes (with navbar) */}
+        <Route element={<MainLayout />}>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
 
-      {/* Admin routes (with admin layout) */}
-      <Route
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
-        <Route path="/admin/products" element={<ProductsDashboard />} />
-        <Route path="/admin/users" element={<UsersDashboard />} />
-        <Route path="/admin/hero-banner" element={<HeroBannerDashboard />} />
-      </Route>
-    </Routes>
+        {/* Admin routes (with admin layout) */}
+        <Route
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
+          <Route path="/admin/products" element={<ProductsDashboard />} />
+          <Route path="/admin/users" element={<UsersDashboard />} />
+          <Route path="/admin/hero-banner" element={<HeroBannerDashboard />} />
+          <Route
+            path="/admin/promo-banner"
+            element={<PromoBannerDashboard />}
+          />
+        </Route>
+      </Routes>
     </>
   );
 };

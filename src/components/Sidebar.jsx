@@ -7,6 +7,7 @@ import {
   FaBars,
   FaTimes,
   FaImage,
+  FaBullhorn,
 } from "react-icons/fa";
 import { FaCartFlatbed } from "react-icons/fa6";
 
@@ -39,6 +40,7 @@ const Sidebar = ({
     { label: "Users", icon: <FaUsers />, key: "users" },
     { label: "Orders", icon: <FaCartFlatbed />, key: "orders" },
     { label: "Hero Banner", icon: <FaImage />, key: "hero-banner" },
+    { label: "Promo Banner", icon: <FaBullhorn />, key: "promo-banner" },
   ];
 
   const handleMenuItemClick = (key) => {

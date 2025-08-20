@@ -50,13 +50,13 @@ const StickyNavbar = () => {
     const scrollDelta = currentY - prevScrollY;
     const isScrollingDown = scrollDelta > 0;
     const isScrollingUp = scrollDelta < 0;
-    
+
     // Clear any existing timeout
     if (hideTimeout) {
       clearTimeout(hideTimeout);
       setHideTimeout(null);
     }
-    
+
     // Simple visibility rules
     if (currentY <= 100) {
       // Always show at top
@@ -64,7 +64,11 @@ const StickyNavbar = () => {
     } else if (isScrollingUp && Math.abs(scrollDelta) > 30) {
       // Show immediately on upward scroll
       setIsVisible(true);
-    } else if (isScrollingDown && Math.abs(scrollDelta) > 80 && currentY > 300) {
+    } else if (
+      isScrollingDown &&
+      Math.abs(scrollDelta) > 80 &&
+      currentY > 300
+    ) {
       // Hide with delay on significant downward scroll
       const timeout = setTimeout(() => {
         setIsVisible(false);
@@ -135,11 +139,11 @@ const StickyNavbar = () => {
   const handleLogout = async () => {
     await logout();
     setIsUserMenuOpen(false);
-    navigate('/');
+    navigate("/");
   };
 
   const handleCartClick = () => {
-    navigate('/cart');
+    navigate("/cart");
   };
 
   // Close menus when clicking outside
@@ -208,8 +212,8 @@ const StickyNavbar = () => {
                   alt="FixPharmacy"
                   className={`object-contain transition-all duration-300 ${
                     isCompact
-                      ? "w-6 h-6 sm:w-8 sm:h-8"
-                      : "w-8 h-8 sm:w-20 sm:h-20"
+                      ? "w-4 h-4 sm:w-8 sm:h-8"
+                      : "w-4 h-4 sm:w-20 sm:h-20"
                   }`}
                 />
                 <div
@@ -324,14 +328,16 @@ const StickyNavbar = () => {
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               // Hide image and show fallback icon
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'block';
+                              e.target.style.display = "none";
+                              e.target.nextSibling.style.display = "block";
                             }}
                           />
                         ) : null}
                         <User
                           size={isCompact ? 12 : 16}
-                          className={`text-blue-600 ${user?.profilePicture ? 'hidden' : 'block'}`}
+                          className={`text-blue-600 ${
+                            user?.profilePicture ? "hidden" : "block"
+                          }`}
                         />
                       </div>
                       <span
@@ -464,24 +470,32 @@ const StickyNavbar = () => {
               >
                 <span>Home</span>
               </button>
-              
+
               {/* Categories Dropdown */}
               <div className="relative group">
-                <button
-                  className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
-                >
+                <button className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm">
                   <Pill size={14} className="sm:w-4 sm:h-4" />
                   <span>Categories</span>
                   <ChevronDown size={12} className="sm:w-3 sm:h-3" />
                 </button>
-                
+
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                   <div className="grid grid-cols-2 gap-1 p-2">
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Pain Relief",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -490,8 +504,18 @@ const StickyNavbar = () => {
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Antibiotics",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -500,8 +524,18 @@ const StickyNavbar = () => {
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Vitamins",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -510,8 +544,18 @@ const StickyNavbar = () => {
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Digestive", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Digestive",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -520,8 +564,18 @@ const StickyNavbar = () => {
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Heart & Blood", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Heart & Blood",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -530,8 +584,18 @@ const StickyNavbar = () => {
                     <button
                       onClick={() => {
                         updateSearch("");
-                        setFilters({ search: "", category: "Respiratory", medicineType: "", page: 1, limit: 12 });
-                        if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                        setFilters({
+                          search: "",
+                          category: "Respiratory",
+                          medicineType: "",
+                          page: 1,
+                          limit: 12,
+                        });
+                        if (
+                          location.pathname !== "/" &&
+                          location.pathname !== "/products"
+                        )
+                          navigate("/products");
                       }}
                       className="flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                     >
@@ -551,20 +615,28 @@ const StickyNavbar = () => {
 
               {/* Medicine Types Dropdown */}
               <div className="relative group">
-                <button
-                  className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm"
-                >
+                <button className="flex items-center space-x-1 sm:space-x-2 text-slate-700 hover:text-blue-600 transition-colors text-sm">
                   <Package size={14} className="sm:w-4 sm:h-4" />
                   <span>Medicine Types</span>
                   <ChevronDown size={12} className="sm:w-3 sm:h-3" />
                 </button>
-                
+
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "",
+                        medicineType: "OTC",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
@@ -574,8 +646,18 @@ const StickyNavbar = () => {
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "",
+                        medicineType: "Prescription",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                     }}
                     className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
@@ -666,16 +748,28 @@ const StickyNavbar = () => {
               >
                 Home
               </a>
-              
+
               {/* Categories Section */}
               <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Categories</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                  Categories
+                </p>
                 <div className="space-y-1">
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "Pain Relief", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "Pain Relief",
+                        medicineType: "",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -685,8 +779,18 @@ const StickyNavbar = () => {
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "Antibiotics", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "Antibiotics",
+                        medicineType: "",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -696,8 +800,18 @@ const StickyNavbar = () => {
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "Vitamins", medicineType: "", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "Vitamins",
+                        medicineType: "",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -716,13 +830,25 @@ const StickyNavbar = () => {
 
               {/* Medicine Types Section */}
               <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Medicine Types</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                  Medicine Types
+                </p>
                 <div className="space-y-1">
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "", medicineType: "OTC", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "",
+                        medicineType: "OTC",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -733,8 +859,18 @@ const StickyNavbar = () => {
                   <button
                     onClick={() => {
                       updateSearch("");
-                      setFilters({ search: "", category: "", medicineType: "Prescription", page: 1, limit: 12 });
-                      if (location.pathname !== "/" && location.pathname !== "/products") navigate("/products");
+                      setFilters({
+                        search: "",
+                        category: "",
+                        medicineType: "Prescription",
+                        page: 1,
+                        limit: 12,
+                      });
+                      if (
+                        location.pathname !== "/" &&
+                        location.pathname !== "/products"
+                      )
+                        navigate("/products");
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center px-3 py-2 text-slate-700 hover:bg-slate-50 rounded-md transition-colors text-sm w-full text-left"
@@ -792,7 +928,6 @@ const StickyNavbar = () => {
           </div>
         )}
       </div>
-
 
       {/* Backdrop for mobile overlays - Modern blur effect */}
       {(isMenuOpen || isSearchOpen) && (
