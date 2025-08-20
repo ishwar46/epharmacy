@@ -21,7 +21,7 @@ import { getStatusColor, getStatusLabel } from "../utils/statusUtils";
 import Loading from "../components/Loading";
 import { useDynamicTitle } from "../hooks/useDynamicTitle";
 
-const AdminOrders = ({ onOrderSelect }) => {
+const AdminOrders = () => {
   // Set dynamic title for orders dashboard
   useDynamicTitle("Orders Management | Admin Dashboard | FixPharmacy");
 
@@ -63,11 +63,9 @@ const AdminOrders = ({ onOrderSelect }) => {
     fetchData();
   }, []);
 
-  // Handle order click - this will call the parent's onOrderSelect function
+  // Handle order click - navigate to order details
   const handleOrderClick = (orderId) => {
-    if (onOrderSelect) {
-      onOrderSelect(orderId);
-    }
+    navigate(`/admin/orders/${orderId}`);
   };
 
   // Filters

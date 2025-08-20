@@ -21,6 +21,7 @@ import OrderHistory from "../pages/customer/OrderHistory";
 import OrderTracking from "../pages/customer/OrderTracking";
 import MainLayout from "../layouts/MainLayout";
 import PlainLayout from "../layouts/PlainLayout";
+import AdminLayout from "../layouts/AdminLayout";
 import ScrollToTop from "../components/common/ScrollToTop";
 
 const AppRoutes = () => {
@@ -61,11 +62,11 @@ const AppRoutes = () => {
         } />
       </Route>
 
-      {/* Admin routes (no navbar) */}
+      {/* Admin routes (with admin layout) */}
       <Route
         element={
           <AdminRoute>
-            <PlainLayout />
+            <AdminLayout />
           </AdminRoute>
         }
       >

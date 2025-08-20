@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaBoxOpen,
@@ -63,7 +64,9 @@ const ErrorMessage = ({ message, onRetry, actionLabel }) => (
   </div>
 );
 
-const AdminOrderDetails = ({ orderId, goBack }) => {
+const AdminOrderDetails = () => {
+  const navigate = useNavigate();
+  const { id: orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
@@ -121,7 +124,7 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
     return (
       <ErrorMessage
         message="Order not found."
-        onRetry={goBack}
+        onRetry={() => navigate('/admin/orders')}
         actionLabel="Back to Orders"
       />
     );
@@ -138,7 +141,7 @@ const AdminOrderDetails = ({ orderId, goBack }) => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <button
-                onClick={goBack}
+                onClick={() => navigate('/admin/orders')}
                 className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors font-medium"
               >
                 <FaArrowLeft />
